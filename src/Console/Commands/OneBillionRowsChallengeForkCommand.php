@@ -12,6 +12,8 @@ namespace App\Console\Commands;
  */
 final class OneBillionRowsChallengeForkCommand 
 {
+    public static string $defaultName = '1brc:fork'; // New property
+
     private string $filePath = BASE_PATH . '/data/measurements.txt';
     private int $numWorkers;
 
@@ -119,7 +121,7 @@ final class OneBillionRowsChallengeForkCommand
             if (!isset($stations[$city])) {
                 $stations[$city] = ['min' => $temp, 'max' => $temp, 'sum' => $temp, 'count' => 1];
             } else {
-                $stationData = &$stations[$city];
+                $stationData = & $stations[$city];
                 $stationData['sum'] += $temp;
                 $stationData['count']++;
                 if ($temp < $stationData['min']) $stationData['min'] = $temp;
@@ -147,7 +149,7 @@ final class OneBillionRowsChallengeForkCommand
                 if (!isset($aggregated[$city])) {
                     $aggregated[$city] = $data;
                 } else {
-                    $aggData = &$aggregated[$city];
+                    $aggData = & $aggregated[$city];
                     $aggData['sum'] += $data['sum'];
                     $aggData['count'] += $data['count'];
                     if ($data['min'] < $aggData['min']) $aggData['min'] = $data['min'];
@@ -180,4 +182,3 @@ final class OneBillionRowsChallengeForkCommand
         echo $output;
     }
 }
-

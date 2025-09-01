@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Http;
+namespace Elementary\Http;
 
-use App\Utils\ParameterBag;
+use Elementary\Utils\ParameterBag;
 
 class Response
 {

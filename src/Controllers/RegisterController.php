@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Http\Request;
-use App\Http\Response;
-use App\Utils\ParameterBag;
-
+use Elementary\Http\Request;
+use Elementary\Http\Response;
+use App\Models\User;
+use Elementary\Utils\ParameterBag;
+use Elementary\Validation\Validator;
 
 class RegisterController extends AbstractController
 {
@@ -19,54 +20,43 @@ class RegisterController extends AbstractController
             'errors' => $errors
         ]);
     }
+
     public function registerUser(Request $request): Response
     {
-        $errors = [];
-        $username = $request->post->get('username');
-        $password = $request->post->get('password');
+        $data = $request->post->all();
 
-
-        $FirstName = $request->post->get('FirstName');
-        $LastName = $request->post->get('LastName');
-        $address = $request->post->get('Address');
-
-
-        if (!$username) {
-            $errors['username'] = 'Username is required';
-        }
-        if (empty($password)) {
-            $errors['password'] = 'Password is  required';
-        }
-        if (filter_var($username, FILTER_VALIDATE_EMAIL) === false) {
-            $errors['username'] = 'Username must be a valid email address';
-        }
-        if (strlen($password) < 8) {
-            $errors['password'] = 'Password  must  be at least 8 character long.';
-        }
-
-        if (empty($FirstName)) {
-            $errors['FirstName'] = 'FirstName is required';
-        }
-        if (empty($LastName)) {
-            $errors['LastName'] = 'LastName is required';
-        }
-        if (empty($address)) {
-            $errors['Address'] = 'address is required';
-        }
-        if (!empty($errors)) {
-            $errors = new ParameterBag($errors);
-            return $this->render('register.html.php', [
-                'request' => $request,
-                'errors' => $errors
-            ]);
-        }
-
-
-
-
-        return $this->render('register.html.php', [
-            'request' => $request,
-            'errors' => new ParameterBag()
+        $validator = new Validator($data, [
+            'FirstName' => ['required'],
+            'LastName' => ['required'],
+            'Address' => ['required'],
+            'username' => ['required', 'email'],
+            'password' => ['required', 'minLength:8'],
         ]);
+
+        if ($validator->fails()) {
+            $this->flashBag->add('errors', $validator->errors());
+            return new Response(302, '', ['Location' => '/Register']);
+        }
+
+        // Check for user uniqueness after basic validation passes
+        if (User::findByEmail($data['username'])) {
+            $this->flashBag->add('errors', ['username' => 'A user with this email address already exists.']);
+            return new Response(302, '', ['Location' => '/Register']);
+        }
+
+        // Hash the password for security
+        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+
+        // Create the new user
+        User::create([
+            'FirstName' => $data['FirstName'],
+            'LastName' => $data['LastName'],
+            'Address' => $data['Address'],
+            'username' => $data['username'], // email
+            'password' => $hashedPassword,
+        ]);
+
+        // Redirect to the login page
+        return new Response(302, '', ['Location' => '/login']);
     }
 }

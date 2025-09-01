@@ -4,11 +4,16 @@
     "version": "1.0.0",
     "type": "library",
     "require": {
-        "php": ">=8.2"
+        "php": ">=8.2",
+        "psr/container": "^2.0"
+    },
+    "require-dev": {
+        "filp/whoops": "^2.15"
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src"
+            "App\\": "src",
+            "Elementary\\": "lib/Elementary"
         },
         "files": [
             "src/functions/dd.php"

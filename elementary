@@ -1,0 +1,17 @@
+#!/usr/bin/env php
+
+<?php
+
+define('BASE_PATH', __DIR__);
+
+require_once BASE_PATH . '/vendor/autoload.php';
+
+use Elementary\Kernel\ConsoleKernel;
+
+$kernel = new ConsoleKernel();
+$kernel->bootstrap();
+
+$statusCode = $kernel->handleCli($argv);
+
+$kernel->terminateCli($statusCode);
+exit($statusCode);

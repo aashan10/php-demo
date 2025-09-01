@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Http\Request;
-use App\Http\Response;
-use App\Utils\ParameterBag;
-
+use Elementary\Http\Request;
+use Elementary\Http\Response;
+use App\Models\User;
+use Elementary\Utils\ParameterBag;
+use Elementary\Validation\Validator;
 
 class LoginController extends AbstractController
 {
@@ -24,39 +25,30 @@ class LoginController extends AbstractController
 
     public function loginUser(Request $request): Response 
     {
-        $errors = [];
+        $data = $request->post->all();
 
-        $username = $request->post->get('username');
-        $password = $request->post->get('password');
+        $validator = new Validator($data, [
+            'username' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
-        if (!$username) {
-            $errors['username'] = 'Username is required.';
+        if ($validator->fails()) {
+            $this->flashBag->add('errors', $validator->errors());
+            return new Response(302, '', ['Location' => '/login']);
         }
 
-        if (!$password) {
-            $errors['password'] = 'Password is required.';
+        $user = User::findByEmail($data['username']);
+
+        if (!$user || !password_verify($data['password'], $user->password)) {
+            $this->flashBag->add('errors', ['credentials' => 'Invalid username or password.']);
+            return new Response(302, '', ['Location' => '/login']);
         }
 
-        if (filter_var($username, FILTER_VALIDATE_EMAIL) === false) {
-            $errors['username'] = 'Username must be a valid email address.';
-        }
+        // Log the user in by setting the session
+        $request->session->set('user_id', $user->id);
 
-        if (strlen($password) < 8) {
-            $errors['password'] = 'Password must be at least 8 characters long.';
-        }
-
-        if (!empty($errors)) {
-            $errors = new ParameterBag($errors);
-
-            return $this->render('signin.html.php', [
-                'request' => $request,
-                'errors' => $errors
-            ]);
-        }
-
-
-
-        return new Response(200, 'Sign-in page');
+        // Redirect to the profile page
+        return new Response(302, '', ['Location' => '/profile']);
     }
 
 }

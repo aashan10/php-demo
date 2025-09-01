@@ -8,37 +8,29 @@
                 <!-- Contact Section Form-->
                 <div class="row justify-content-center">
                     <div class="col-lg-8 col-xl-7">
-                        <!-- * * * * * * * * * * * * * * *-->
-                        <!-- * * SB Forms Contact Form * *-->
-                        <!-- * * * * * * * * * * * * * * *-->
-                        <!-- This form is pre-integrated with SB Forms.-->
-                        <!-- To make this form functional, sign up at-->
-                        <!-- https://startbootstrap.com/solution/contact-forms-->
-                        <!-- to get an API token!-->
+                        <!-- Display Flash Errors -->
+                <?php if (!empty($flash_errors)): ?>
+                            <div class="alert alert-danger" role="alert">
+                                <ul class="list-unstyled mb-0">
+                        <?php foreach ($flash_errors as $field => $message): ?>
+                                        <li><?= htmlspecialchars($message) ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
+                        <?php endif; ?>
+
                         <form  method="post" action="/login">
                             <!-- Name input-->
                             
                             <!-- Email address input-->
                             <div class="form-floating mb-3">
-                                <input class="form-control" value="<?= $request->post->get('username', '') ?>"  id="email" type="text" placeholder="name@example.com" name="username" />
+                                <input class="form-control" value="<?= htmlspecialchars($request->post->get('username', '')) ?>"  id="email" type="text" placeholder="name@example.com" name="username" />
                                 <label for="email">Email address</label>
-                                
-                                <?php if ($errors->has('username')): ?>
-                                    <div class="error-message">
-                                        <?php echo $errors->get('username'); ?>
-                                    </div>
-                                <?php endif; ?>
                             </div>
                             <!-- Password address input-->
                             <div class="form-floating mb-3">
                                 <input class="form-control" id="password" type="password" placeholder="Enter your password" name="password" />
                                 <label for="password">Password</label>
-                                
-                                <?php if ($errors->has('password')): ?>
-                                    <div class="error-message">
-                                        <?php echo $errors->get('password'); ?>
-                                    </div>
-                                <?php endif; ?>
                             </div>
                             <!-- Submit Button-->
                             <button class="btn btn-primary btn-lg" id="submitButton" type="submit">Login</button>

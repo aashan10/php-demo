@@ -6,6 +6,8 @@ namespace App\Console\Commands;
 
 final class OneBillionRowsChallengeCommand 
 {
+    public static string $defaultName = '1brc:execute'; // New property
+
     private string $filePath = BASE_PATH . '/data/measurements.txt';
     public function execute(array $args): int 
     {
@@ -25,7 +27,7 @@ final class OneBillionRowsChallengeCommand
             } else {
                 $map[$city] = [
                     'sum' => (float)$temperature,
-                    'count' => 1
+                    'count': 1
                 ];
             }
 

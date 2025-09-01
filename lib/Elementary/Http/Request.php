@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Http;
+namespace Elementary\Http;
 
-use App\Utils\ParameterBag;
+use Elementary\Utils\ParameterBag;
+use Elementary\Utils\SessionBag;
+use Elementary\Utils\UploadedFile;
 
 final class Request {
 
@@ -16,6 +18,7 @@ final class Request {
     public readonly ParameterBag $headers;
     public readonly ParameterBag $attributes;
     public readonly ParameterBag $request;
+    public readonly SessionBag $session;
     public readonly ?string $content;
 
 
@@ -29,6 +32,7 @@ final class Request {
      * @param array $server The server parameters.
      * @param array $headers The request headers.
      * @param array $request The request parameters.
+     * @param SessionBag $session The session bag.
      * @param array $attributes Additional attributes for the request.
      * @param string|null $content The raw content of the request body, if any.
      */
@@ -40,6 +44,7 @@ final class Request {
         array $server,
         array $headers,
         array $request,
+        SessionBag $session,
         array $attributes = [],
         ?string $content = null
 
@@ -47,11 +52,12 @@ final class Request {
         $this->get = new ParameterBag($get);
         $this->post = new ParameterBag($post);
         $this->cookies = new ParameterBag($cookies);
-        $this->files = new ParameterBag($files);
+        $this->files = new ParameterBag(array_map(array: $files, callback: fn($file) => new UploadedFile(...$file)));
         $this->server = new ParameterBag($server);
         $this->headers = new ParameterBag($headers);
         $this->attributes = new ParameterBag($attributes);
         $this->request = new ParameterBag($request);
+        $this->session = $session;
         $this->content = $content;
     }
     public static function createFromGlobals(): self {
@@ -63,6 +69,7 @@ final class Request {
             server: $_SERVER,
             headers: getallheaders(),
             request: $_REQUEST,
+            session: new SessionBag(),
             attributes: [],
             content: file_get_contents('php://input')
         );

@@ -5,7 +5,7 @@
                 <!-- Masthead Avatar Image-->
                 <img class="masthead-avatar mb-5" src="https://scontent.fktm17-1.fna.fbcdn.net/v/t39.30808-6/383354098_741388271085352_6146078748877455913_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeEJ_bsiUTpDhgNsUQz0GhsE05F6irO4DYzTkXqKs7gNjK84ULPn0Poo6gGmyt_EWm4-HmNeUyRyh2RPZ4HDfJ21&_nc_ohc=ymFNpDjCcysQ7kNvwF5R8RL&_nc_oc=Adks_LGEwgEg5TdYA7Soi7UVh21z0mMLeFW9aGzoJyCDmgjGGAIo_mqqf0l8xgf2Uf36m5I1QtST9wx4eNUBlubi&_nc_zt=23&_nc_ht=scontent.fktm17-1.fna&_nc_gid=a6HVSO0ZuSXfWjDpgE-Ahw&oh=00_AfSkoEsdlLfIpdpvhrVFRYkWWWbeQriNf3ldOtDGj9VviQ&oe=6889520C" alt="..." />
                 <!-- Masthead Heading-->
-                <h1 class="masthead-heading text-uppercase mb-0"><?= $name ?? 'Amrit' ?></h1>
+                <h1 class="masthead-heading text-uppercase mb-0"><?= htmlspecialchars($name ?? 'Amrit') ?></h1>
                 <!-- Icon Divider-->
                 <div class="divider-custom divider-light">
                     <div class="divider-custom-line"></div>
