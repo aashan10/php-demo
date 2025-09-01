@@ -1,6 +1,7 @@
 <?php
 
 define('TEMPLATE_PATH', __DIR__ . '/../templates/');
+define('UPLOAD_PATH', __DIR__ . "/uploads/");
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
