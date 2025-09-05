@@ -17,7 +17,7 @@
             @foreach($users as $index => $user)
             <div class="user-card" data-index="{{ $index }}">
                 <h3>{{ $user["name"] }}</h3>
-                <p>Email: {!! $user["email"] !!}</p>
+                <p>Email: {{ $user["email"] }}</p>
 
                 @if(isset($user["posts"]) && count($user["posts"]) > 0)
                 <h4>Recent Posts:</h4>

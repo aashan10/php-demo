@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Elementary\Kernel;
 
-use App\Middleware\Authenticate;
-use App\Middleware\TrimStrings;
 use Elementary\Config\ConfigBag;
 use Elementary\Database\Connection;
 use Elementary\DI\Container;
@@ -21,11 +19,6 @@ use Whoops\Handler\PrettyPageHandler;
 class HttpKernel implements KernelInterface
 {
     private Container $container;
-
-    protected array $routeMiddleware = [
-        'trim' => TrimStrings::class,
-        'auth' => Authenticate::class,
-    ];
 
     public function __construct()
     {
@@ -112,14 +105,23 @@ class HttpKernel implements KernelInterface
     private function resolveMiddleware(array $aliases): array
     {
         $resolved = [];
+        $middlewareConfig = $this->container->get(ConfigBag::class)->get('middleware', []);
+        $middlewareAliases = $middlewareConfig['aliases'] ?? [];
+        $middlewareGroups = $middlewareConfig['groups'] ?? [];
+
         foreach ($aliases as $alias) {
-            if (isset($this->routeMiddleware[$alias])) {
-                $resolved[] = $this->routeMiddleware[$alias];
-            } else if (class_exists($alias)) {
+            if (isset($middlewareGroups[$alias])) {
+                // It's a group, recursively resolve the middleware inside it.
+                $resolved = array_merge($resolved, $this->resolveMiddleware($middlewareGroups[$alias]));
+            } elseif (isset($middlewareAliases[$alias])) {
+                // It's an alias for a single middleware
+                $resolved[] = $middlewareAliases[$alias];
+            } elseif (class_exists($alias)) {
+                // It's a direct FQCN
                 $resolved[] = $alias;
             }
         }
-        return $resolved;
+        return array_unique($resolved);
     }
 
     public function handleCli(array $argv): int
