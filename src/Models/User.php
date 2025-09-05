@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use PDO;
-
+use Elementary\Database\AbstractModel;
 
 /**
  * Represents a User in the application.
@@ -14,12 +13,16 @@ final class User extends AbstractModel
 {
     protected static string $tableName = 'users';
 
-    public int $id;
-    public string $FirstName;
-    public string $LastName;
-    public string $Address;
-    public string $username; // This is the email
-    public string $password; // This should be a hashed value
+    public int    $id;
+    public string $first_name;
+    public string $last_name;
+    public string $email;
+    public string $password; 
+    public string $profile_picture;
+    public bool   $is_active;
+    public string $created_at;
+    public string $updated_at;
+
 
     /**
      * Finds a user by their email address (username).

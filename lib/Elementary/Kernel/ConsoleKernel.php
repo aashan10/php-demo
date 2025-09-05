@@ -58,10 +58,6 @@ class ConsoleKernel implements KernelInterface
         $container = $this->container; // Make container available to included file
         require_once BASE_PATH . '/bootstrap.php';
 
-        // Set the container on the AbstractModel for static access
-        // This binding is now in bootstrap.php
-        // AbstractModel::setContainer($this->container);
-
         // Discover CLI commands
         $this->discoverCommands();
     }

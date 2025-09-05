@@ -3,7 +3,7 @@
 use Elementary\Config\ConfigBag;
 use Elementary\Database\Connection;
 use Elementary\DI\Container;
-use App\Models\AbstractModel;
+use Elementary\Database\AbstractModel;
 use App\Repositories\UserRepository;
 use App\Repositories\UserRepositoryInterface;
 use Elementary\Template\Cigg\Engine as ElementaryEngine;

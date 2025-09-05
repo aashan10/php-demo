@@ -8,7 +8,7 @@ Database connection settings are stored in the `config/database.php` file. These
 
 ## Models
 
-Models are classes that represent a single table in your database. They are located in the `src/Models` directory and should extend the `App\Models\AbstractModel`.
+Models are classes that represent a single table in your database. They should extend the `Elementary\Database\AbstractModel` class, which provides the core ORM functionality.
 
 The only requirement for a model class is to define the static `$tableName` property.
 
@@ -112,4 +112,53 @@ This allows you to easily find a user by their email from anywhere in your appli
 $user = User::findByEmail('john@example.com');
 ```
 
-*Note: The query builder does not yet support `INSERT`, `UPDATE`, or `DELETE` operations. This functionality can be added in the future.*
+## Modifying Records
+
+The query builder supports `INSERT`, `UPDATE`, and `DELETE` operations.
+
+### Inserting Records
+
+You can insert new records into the database using the `create()` static method on your model.
+
+```php
+// Create a new user
+$success = User::create([
+    'FirstName' => 'John',
+    'LastName' => 'Doe',
+    'username' => 'john.doe@example.com',
+    'password' => password_hash('secret', PASSWORD_DEFAULT), // Always hash passwords!
+]);
+```
+
+### Updating Records
+
+To update existing records, you can use the `update()` method on a model instance. This will update the record corresponding to the model's primary key.
+
+```php
+// Assuming $user is an instance of User model, e.g., $user = User::find(1);
+$user->FirstName = 'Jonathan';
+$affectedRows = $user->update(['FirstName' => $user->FirstName]);
+```
+
+Alternatively, you can update records using the query builder with `where` clauses:
+
+```php
+// Update all users with a specific username
+$affectedRows = User::query()->where('username', '=', 'old@example.com')->update(['username' => 'new@example.com']);
+```
+
+### Deleting Records
+
+To delete a record, you can use the `delete()` method on a model instance.
+
+```php
+// Assuming $user is an instance of User model, e.g., $user = User::find(1);
+$affectedRows = $user->delete();
+```
+
+You can also delete records using the query builder with `where` clauses:
+
+```php
+// Delete all inactive users
+$affectedRows = User::query()->where('status', '=', 'inactive')->delete();
+```
