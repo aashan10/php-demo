@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>User List</title>
+        <title>{{ $app_name }}</title>
         <style>
         body { font-family: sans-serif; line-height: 1.6; padding: 20px; }
         ul { list-style-type: none; padding: 0; }

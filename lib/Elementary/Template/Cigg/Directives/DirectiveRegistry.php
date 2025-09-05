@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace Elementary\Template\Cigg\Directives;
 
-use Elementary\Template\Cigg\Directives\BuiltIn\CsrfDirective;
-use Elementary\Template\Cigg\Directives\BuiltIn\JsonDirective;
-use Elementary\Template\Cigg\Directives\BuiltIn\IfDirective;
-use Elementary\Template\Cigg\Directives\BuiltIn\ForeachDirective;
-
 class DirectiveRegistry
 {
     private array $directives = [];
@@ -16,7 +11,6 @@ class DirectiveRegistry
 
     public function __construct()
     {
-        $this->registerBuiltInDirectives();
     }
 
     /**
@@ -103,12 +97,6 @@ class DirectiveRegistry
         $this->callableDirectives = [];
     }
 
-    private function registerBuiltInDirectives(): void
-    {
-        $this->register(new CsrfDirective());
-        $this->register(new JsonDirective());
-        $this->register(new IfDirective());
-        $this->register(new ForeachDirective());
-    }
+    
 }
 

@@ -20,9 +20,9 @@ class Compiler implements CompilerInterface, NodeVisitor
 {
     private DirectiveRegistry $directiveRegistry;
 
-    public function __construct(?DirectiveRegistry $directiveRegistry = null)
+    public function __construct(DirectiveRegistry $directiveRegistry)
     {
-        $this->directiveRegistry = $directiveRegistry ?? new DirectiveRegistry();
+        $this->directiveRegistry = $directiveRegistry;
         $this->injectCompilerIntoDirectives();
     }
 
