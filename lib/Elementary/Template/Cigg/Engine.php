@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Elementary\Template\Cigg;
 
+use Elementary\Config\ConfigBag;
 use Elementary\Template\Cigg\Lexer\Lexer;
 use Elementary\Template\Cigg\Parser\Parser;
 use Elementary\Template\Cigg\Compiler\Compiler;
-use Elementary\Template\Cigg\Directives\DirectiveRegistry;
 use Elementary\Template\Cigg\Directives\DirectiveInterface;
 
 /**
@@ -18,22 +18,24 @@ class Engine
     private Lexer $lexer;
     private Parser $parser;
     private Compiler $compiler;
-    private DirectiveRegistry $directiveRegistry;
-    
+
     private string $viewsPath;
     private string $cachePath;
     private array $globals = [];
 
-    public function __construct(string $viewsPath, string $cachePath)
-    {
-        $this->viewsPath = rtrim($viewsPath, '/');
-        $this->cachePath = rtrim($cachePath, '/');
-        
-        $this->lexer = new Lexer();
-        $this->parser = new Parser();
-        $this->directiveRegistry = new DirectiveRegistry();
-        $this->compiler = new Compiler($this->directiveRegistry);
-        
+    public function __construct(
+        ConfigBag $config,
+        Lexer $lexer,
+        Parser $parser,
+        Compiler $compiler
+    ) {
+        $this->viewsPath = rtrim($config->get('template.paths.views'), '/');
+        $this->cachePath = rtrim($config->get('template.paths.cache'), '/');
+
+        $this->lexer = $lexer;
+        $this->parser = $parser;
+        $this->compiler = $compiler;
+
         // Ensure cache directory exists
         if (!is_dir($this->cachePath)) {
             mkdir($this->cachePath, 0755, true);
@@ -68,7 +70,7 @@ class Engine
      */
     public function directive(DirectiveInterface $directive): void
     {
-        $this->directiveRegistry->register($directive);
+        $this->compiler->getDirectiveRegistry()->register($directive);
     }
 
     /**
@@ -76,7 +78,7 @@ class Engine
      */
     public function directiveCallable(string $name, callable $handler): void
     {
-        $this->directiveRegistry->registerCallable($name, $handler);
+        $this->compiler->getDirectiveRegistry()->registerCallable($name, $handler);
     }
 
     /**

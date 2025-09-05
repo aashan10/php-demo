@@ -6,7 +6,10 @@ use Elementary\DI\Container;
 use App\Models\AbstractModel;
 use App\Repositories\UserRepository;
 use App\Repositories\UserRepositoryInterface;
-use Elementary\Template\Cigg\Engine as ElementaryEngine;
+use Elementary\Template\Cigg\Compiler\Compiler;
+use Elementary\Template\Cigg\Engine;
+use Elementary\Template\Cigg\Lexer\Lexer;
+use Elementary\Template\Cigg\Parser\Parser;
 use Elementary\Utils\FlashBag;
 use Elementary\Utils\SessionBag;
 
@@ -31,8 +34,14 @@ $container->bind(Connection::class, fn(Container $c) => new Connection($c->get(C
 $container->bind(UserRepositoryInterface::class, UserRepository::class);
 
 
-$container->bind(ElementaryEngine::class, function (Container $c): ElementaryEngine {
-    $engine = new ElementaryEngine(TEMPLATE_PATH, CACHE_PATH . '/templates');
+
+$container->bind(Engine::class, function (Container $c): Engine {
+    $engine = new Engine(
+        $c->get(ConfigBag::class),
+        $c->get(Lexer::class),
+        $c->get(Parser::class),
+        $c->get(Compiler::class)
+    );
 
     $engine->addGlobal('app_name', $c->get(ConfigBag::class)->get('app.name', 'MyApp'));
 
