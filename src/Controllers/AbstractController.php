@@ -6,21 +6,19 @@ namespace App\Controllers;
 
 use Elementary\Http\Response;
 use Elementary\Utils\FlashBag;
-use Elementary\DI\Container;
+use Elementary\Template\Cigg\Engine as TemplateEngine;
 
-abstract class AbstractController {
+abstract class AbstractController
+{
 
-    protected FlashBag $flashBag;
-
-    public function __construct(FlashBag $flashBag)
+    public function __construct(protected FlashBag $flashBag, protected TemplateEngine $engine)
     {
-        $this->flashBag = $flashBag;
     }
-    
+
     protected function render(string $templateName, array $args = []): Response
     {
-        $args['flash_errors'] = $this->flashBag->get('errors', []);
-        
-        return (new Response())->setTemplate(TEMPLATE_PATH . $templateName, $args);
+        $response = $this->engine->render($templateName, $args);
+
+        return new Response(200, $response);
     }
 }

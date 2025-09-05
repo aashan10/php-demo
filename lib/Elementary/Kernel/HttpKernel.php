@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Elementary\Kernel;
 
+use App\Middleware\Authenticate;
+use App\Middleware\TrimStrings;
 use Elementary\Config\ConfigBag;
 use Elementary\Database\Connection;
 use Elementary\DI\Container;
 use Elementary\Http\Request;
 use Elementary\Http\Response;
-use Elementary\Http\Router;
+use Elementary\Routing\Router;
+use Elementary\Http\MiddlewareDispatcher;
 use Elementary\Utils\FlashBag;
 use Elementary\Utils\SessionBag;
 use Whoops\Run;
@@ -18,19 +21,21 @@ use Whoops\Handler\PrettyPageHandler;
 class HttpKernel implements KernelInterface
 {
     private Container $container;
-    private Router $router;
+
+    protected array $routeMiddleware = [
+        'trim' => TrimStrings::class,
+        'auth' => Authenticate::class,
+    ];
 
     public function __construct()
     {
-        // Constructor is empty, bootstrap will set up the container and router
     }
 
     public function bootstrap(): void
     {
         $this->container = new Container();
 
-        // Register Whoops error handler for development
-        $this->container->bind(ConfigBag::class, fn() => new ConfigBag(BASE_PATH . '/config')); // Temporarily bind ConfigBag to get env
+        $this->container->bind(ConfigBag::class, fn() => new ConfigBag(BASE_PATH . '/config'));
         $config = $this->container->get(ConfigBag::class);
 
         if ($config->get('app.env') === 'development') {
@@ -38,59 +43,97 @@ class HttpKernel implements KernelInterface
             $whoops->pushHandler(new PrettyPageHandler());
             $whoops->register();
         }
-        // End Whoops registration
 
-        // Bind framework-level components
-        // ConfigBag is already bound above
-        $this->container->bind(ConfigBag::class, fn() => $config); // Re-bind the instance
-
-        $session = new SessionBag();
-        $this->container->bind(SessionBag::class, fn() => $session);
-
-        $flashBag = new FlashBag($session);
-        $this->container->bind(FlashBag::class, fn() => $flashBag);
-
+        $this->container->bind(SessionBag::class, fn() => new SessionBag());
+        $this->container->bind(FlashBag::class, fn(Container $c) => new FlashBag($c->get(SessionBag::class)));
         $this->container->bind(Connection::class, fn(Container $c) => new Connection($c->get(ConfigBag::class)));
-
-        // Bind Request to a factory
         $this->container->bind(Request::class, fn() => Request::createFromGlobals());
 
-        // Load application-specific bindings from bootstrap.php
-        $container = $this->container; // Make container available to included file
+        $container = $this->container;
         require_once BASE_PATH . '/bootstrap.php';
 
-        // Instantiate Router
-        $this->router = new Router($this->container);
-
-        // Load application routes
-        $router = $this->router; // Make router available to included file
         require_once BASE_PATH . '/routes/web.php';
     }
 
     public function handle(): Response
     {
-        if (!isset($this->router)) {
-            $this->bootstrap(); // Ensure bootstrap is called if not already
+        if (!isset($this->container)) {
+            $this->bootstrap();
         }
         $request = $this->container->get(Request::class);
-        return $this->router->handle($request);
+        try {
+            $route = Router::match($request);
+
+            if ($route === null) {
+                throw new \Exception('Page not found', 404);
+            }
+
+            $controller = $route->getAction();
+            $middlewareAliases = $route->middleware;
+
+            $resolvedMiddleware = $this->resolveMiddleware($middlewareAliases);
+
+            $controllerHandler = function (Request $request) use ($controller) {
+                return $this->dispatchController($controller, $request);
+            };
+
+            $dispatcher = new MiddlewareDispatcher(
+                $resolvedMiddleware,
+                $controllerHandler,
+                $this->container
+            );
+
+            return $dispatcher->dispatch($request);
+
+        } catch (\Throwable $e) {
+            if ($this->container->get(ConfigBag::class)->get('app.env') === 'development') {
+                throw $e;
+            }
+            if ($e->getCode() === 404) {
+                return new Response(404, 'Page not found.');
+            }
+            return new Response(500, 'An internal server error occurred.');
+        }
+    }
+
+    private function dispatchController(callable|string $controller, Request $request): Response
+    {
+        if (is_string($controller)) {
+            [$className, $methodName] = explode('@', $controller);
+            $object = $this->container->get($className);
+            if (!method_exists($object, $methodName)) {
+                return new Response(500, "Method {$methodName} not found in {$className}");
+            }
+            return $object->{$methodName}($request);
+        }
+        return $controller($request);
+    }
+
+    private function resolveMiddleware(array $aliases): array
+    {
+        $resolved = [];
+        foreach ($aliases as $alias) {
+            if (isset($this->routeMiddleware[$alias])) {
+                $resolved[] = $this->routeMiddleware[$alias];
+            } else if (class_exists($alias)) {
+                $resolved[] = $alias;
+            }
+        }
+        return $resolved;
     }
 
     public function handleCli(array $argv): int
     {
-        // Not applicable for HttpKernel
         throw new \BadMethodCallException("handleCli not implemented for HttpKernel");
     }
 
     public function terminate(Response $response): void
     {
-        // Perform any cleanup or logging after response is sent
-        // For now, nothing specific
     }
 
     public function terminateCli(int $statusCode): void
     {
-        // Not applicable for HttpKernel
         throw new \BadMethodCallException("terminateCli not implemented for HttpKernel");
     }
 }
+

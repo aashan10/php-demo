@@ -1,35 +1,22 @@
 <?php
 
-use Elementary\Http\Router;
+use Elementary\Routing\Router;
 use Elementary\Http\Request;
 use Elementary\Http\Response;
-use App\Controllers\LoginController;
-use App\Controllers\PagesController;
-use App\Controllers\RegisterController;
 
-/** @var Router $router */
+Router::get('/', function () {
+    return new Response(200, '<h1>Hello from the new Routing Layer!</h1>');
+})->name('home');
 
-$router->get('/',PagesController::class.'@homePage');
-$router->get('/login', LoginController::class . '@showLoginPage');
-$router->post('/login', LoginController::class . '@loginUser');
+Router::post('/test-middleware', function (Request $request) {
+    dd($request->post->all());
+})->middleware('trim')->name('test.middleware');
 
+Router::prefix('admin')->middleware('auth')->group(function () {
+    Router::get('/dashboard', function () {
+        return new Response(200, '<h1>Admin Dashboard</h1>');
+    })->name('admin.dashboard');
+});
 
+Router::get('/users', 'App\\Controllers\\UserController@index')->name('users.index');
 
-$router->get('/Register', RegisterController::class . '@showRegisterPage');
-$router->post('/Register', RegisterController::class . '@registerUser');
-
-
-
-
-$router->get('/amrit', PagesController::class . '@homePage');
-
-
-
-$router->get('/profile', PagesController::class . '@profilePage');
-$router->post('/profile', PagesController::class . '@updateProfile');
-
-$router->get('/user/{id}', PagesController::class . '@showUserProfile');
-
-// $router->get('/', function (Request $request): Response {
-//     return new Response(200, '');
-// });
