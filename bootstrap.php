@@ -31,6 +31,10 @@ $container->bind(FlashBag::class, fn() => $flashBag);
 // Bind Connection (using a factory to ensure ConfigBag is available)
 $container->bind(Connection::class, fn(Container $c) => new Connection($c->get(ConfigBag::class)));
 
+// Bind Query Builder
+use Elementary\Database\QueryBuilder;
+$container->bind(QueryBuilder::class, fn(Container $c) => new QueryBuilder($c->get(Connection::class)->getInstance()));
+
 // Bind User Repository Interface
 $container->bind(UserRepositoryInterface::class, UserRepository::class);
 

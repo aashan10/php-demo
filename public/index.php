@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+// session_start(); // This is now handled by the StartSession middleware
 
 define('BASE_PATH', __DIR__ . '/..');
 define('TEMPLATE_PATH', BASE_PATH . '/templates');

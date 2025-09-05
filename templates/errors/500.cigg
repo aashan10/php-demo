@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>500 Internal Server Error</title>
+    <style>
+        body { background-color: #f4f4f4; color: #333; font-family: sans-serif; text-align: center; padding: 150px; margin: 0; }
+        h1 { font-size: 50px; margin: 0; }
+        p { font-size: 20px; }
+    </style>
+</head>
+<body>
+    <h1>500</h1>
+    <p>An unexpected error occurred on the server.</p>
+    <p>We are working to fix the problem. Please try again later.</p>
+</body>
+</html>

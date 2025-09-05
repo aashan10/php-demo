@@ -79,13 +79,30 @@ class HttpKernel implements KernelInterface
             return $dispatcher->dispatch($request);
 
         } catch (\Throwable $e) {
-            if ($this->container->get(ConfigBag::class)->get('app.env') === 'development') {
+            $config = $this->container->get(ConfigBag::class);
+
+            if ($config->get('app.env') === 'development') {
                 throw $e;
             }
-            if ($e->getCode() === 404) {
-                return new Response(404, 'Page not found.');
+
+            try {
+                /** @var \Elementary\Template\Cigg\Engine $engine */
+                $engine = $this->container->get(\Elementary\Template\Cigg\Engine::class);
+
+                if ($e->getCode() === 404) {
+                    $content = $engine->render('errors/404');
+                    return new Response(404, $content);
+                }
+
+                $content = $engine->render('errors/500');
+                return new Response(500, $content);
+            } catch (\Throwable $renderingException) {
+                // Fallback if the template rendering itself fails
+                if ($e->getCode() === 404) {
+                    return new Response(404, 'Page not found.');
+                }
+                return new Response(500, 'An internal server error occurred.');
             }
-            return new Response(500, 'An internal server error occurred.');
         }
     }
 

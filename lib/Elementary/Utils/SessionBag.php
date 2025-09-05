@@ -12,9 +12,8 @@ class SessionBag
 {
     public function __construct()
     {
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            throw new \LogicException('Sessions are not active. Please call session_start() first.');
-        }
+        // The StartSession middleware is now responsible for starting the session.
+        // This constructor is intentionally left empty.
     }
 
     /**

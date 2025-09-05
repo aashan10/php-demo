@@ -1,6 +1,6 @@
 # Database and Models
 
-The Elementary framework provides a straightforward way to interact with your database using an Active Record-like pattern.
+The Elementary framework provides a powerful and fluent query builder to interact with your database, while allowing your model classes to remain clean and simple.
 
 ## Configuration
 
@@ -10,9 +10,7 @@ Database connection settings are stored in the `config/database.php` file. These
 
 Models are classes that represent a single table in your database. They are located in the `src/Models` directory and should extend the `App\Models\AbstractModel`.
 
-### Creating a Model
-
-To create a model, you need to define the class and set the static `$tableName` property.
+The only requirement for a model class is to define the static `$tableName` property.
 
 ```php
 // src/Models/User.php
@@ -32,73 +30,86 @@ class User extends AbstractModel
 }
 ```
 
-### Conventions
+## Querying the Database
 
-The `AbstractModel` assumes the following conventions:
-
--   The primary key of the table is named `id`.
--   The model's public properties have the same names as the columns in the table.
-
-## Basic Usage
-
-The `AbstractModel` provides several static methods for common database operations.
-
-### Finding Records
+All queries are performed through the fluent query builder. To start a query, use the static `query()` method on your model.
 
 ```php
-// Find a user by their primary key
-$user = User::find(1);
-
-// Find all users
-$allUsers = User::findAll();
+$users = User::query()->get();
 ```
 
-### Creating Records
+The `query()` method returns an instance of the `QueryBuilder` class, which allows you to chain various methods to build and execute your query.
 
-The `create()` method accepts an associative array of data to insert. It returns the ID of the new record.
+### Retrieving Records
+
+You can retrieve multiple records using `get()` or a single record using `first()`.
 
 ```php
-$newUserId = User::create([
-    'FirstName' => 'John',
-    'LastName' => 'Doe',
-    'username' => 'john.doe@example.com',
-    'password' => password_hash('secret', PASSWORD_DEFAULT),
-]);
+// Get all users
+$allUsers = User::query()->get();
+
+// Get the first user
+$firstUser = User::query()->first();
 ```
 
-### Updating Records
+### Adding `WHERE` Clauses
 
-The `update()` method takes the ID of the record to update and an associative array of data.
+You can filter your query by adding `WHERE` clauses.
 
 ```php
-User::update(1, [
-    'FirstName' => 'Jane'
-]);
+// Get all active users
+$activeUsers = User::query()->where('status', '=', 'active')->get();
+
+// Get a specific user by email
+$user = User::query()->where('username', '=', 'jane@example.com')->first();
 ```
 
-### Deleting Records
+### Finding by Primary Key
 
-The `delete()` method takes the ID of the record to delete.
+A convenient shortcut for finding a record by its `id` is the `find()` method.
 
 ```php
-User::delete(1);
+// Find a user with an ID of 1
+$user = User::query()->find(1);
+
+// This is equivalent to:
+$user = User::query()->where('id', '=', 1)->first();
 ```
 
-### Custom Queries
+### Ordering and Limiting
 
-For more complex queries, you can add custom methods to your model. You can get the PDO instance via the container to build your own queries.
+You can easily order and limit your results.
+
+```php
+// Get the 10 most recently registered users
+$latestUsers = User::query()->orderBy('created_at', 'DESC')->limit(10)->get();
+```
+
+## Custom Query Methods
+
+For queries that you run often, you can add custom methods to your model class to create reusable query scopes.
 
 ```php
 // In the User model
-public static function findByEmail(string $email): ?static
+
+class User extends AbstractModel
 {
-    /** @var static $instance */
-    $instance = self::getContainer()->get(static::class);
+    // ...
 
-    $stmt = $instance->getPdo()->prepare("SELECT * FROM " . static::$tableName . " WHERE username = :email");
-    $stmt->execute(['email' => $email]);
-    $record = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-    // ... (code to hydrate and return a model instance)
+    /**
+     * Finds a user by their email address (username).
+     */
+    public static function findByEmail(string $email): ?static
+    {
+        return static::query()->where('username', '=', $email)->first();
+    }
 }
 ```
+
+This allows you to easily find a user by their email from anywhere in your application:
+
+```php
+$user = User::findByEmail('john@example.com');
+```
+
+*Note: The query builder does not yet support `INSERT`, `UPDATE`, or `DELETE` operations. This functionality can be added in the future.*

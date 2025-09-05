@@ -29,24 +29,6 @@ final class User extends AbstractModel
      */
     public static function findByEmail(string $email): ?static
     {
-        /** @var static $instance */
-        $instance = self::getContainer()->get(static::class);
-
-        $stmt = $instance->getPdo()->prepare("SELECT * FROM " . static::$tableName . " WHERE username = :email");
-        $stmt->execute(['email' => $email]);
-        $record = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($record === false) {
-            return null;
-        }
-
-        // Populate a new instance with data
-        $model = self::getContainer()->get(static::class); // Get a fresh instance from container
-        foreach ($record as $key => $value) {
-            if (property_exists($model, $key)) {
-                $model->{$key} = $value;
-            }
-        }
-        return $model;
+        return static::query()->where('username', '=', $email)->first();
     }
 }

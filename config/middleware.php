@@ -1,6 +1,7 @@
 <?php
 
 use App\Middleware\Authenticate;
+use App\Middleware\StartSession;
 use App\Middleware\TrimStrings;
 
 return [
@@ -30,6 +31,7 @@ return [
     */
     'groups' => [
         'web' => [
+            StartSession::class,
             TrimStrings::class,
         ],
         'api' => [
