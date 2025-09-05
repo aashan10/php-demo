@@ -6,6 +6,7 @@ use Elementary\DI\Container;
 use App\Models\AbstractModel;
 use App\Repositories\UserRepository;
 use App\Repositories\UserRepositoryInterface;
+use Elementary\Template\Cigg\Engine as ElementaryEngine;
 use Elementary\Utils\FlashBag;
 use Elementary\Utils\SessionBag;
 
@@ -29,5 +30,14 @@ $container->bind(Connection::class, fn(Container $c) => new Connection($c->get(C
 // Bind User Repository Interface
 $container->bind(UserRepositoryInterface::class, UserRepository::class);
 
-// Set the container on the AbstractModel for static access
+
+$container->bind(ElementaryEngine::class, function (Container $c): ElementaryEngine {
+    $engine = new ElementaryEngine(TEMPLATE_PATH, CACHE_PATH . '/templates');
+
+    $engine->addGlobal('app_name', $c->get(ConfigBag::class)->get('app.name', 'MyApp'));
+
+    return $engine;
+});
+
+
 AbstractModel::setContainer($container);

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        a
+        <meta charset="UTF-8">
+        <title>User List</title>
+        <style>
+        body { font-family: sans-serif; line-height: 1.6; padding: 20px; }
+        ul { list-style-type: none; padding: 0; }
+        li { background: #f4f4f4; margin: 5px 0; padding: 10px; border-radius: 5px; }
+        p { color: #888; }
+        </style>
+    </head>
+    <body>
+        <h1>User List</h1>
+
+        <div class="user-grid">
+            @foreach($users as $index => $user)
+            <div class="user-card" data-index="{{ $index }}">
+                <h3>{{ $user["name"] }}</h3>
+                <p>Email: {!! $user["email"] !!}</p>
+
+                @if(isset($user["posts"]) && count($user["posts"]) > 0)
+                <h4>Recent Posts:</h4>
+                <ul>
+                    @foreach($user["posts"] as $post)
+                    <li>
+                        <strong>{{ $post["title"] }}</strong>
+                        <br>
+                        <small>{{ $post["date"] }}</small>
+                    </li>
+                    @endforeach
+                </ul>
+                @endif
+            </div>
+            @endforeach
+        </div>
+    </body>
+</html>
