@@ -93,7 +93,7 @@ Here is an example of a main layout file (`layouts/app.cigg`):
 You can extend a layout using the `@extends` directive. You can then inject content into the layout's sections using `@section` blocks.
 
 ```html
-@extends('layouts.app')
+@extends('layouts/app')
 
 @section('title')
     My Page Title
@@ -110,7 +110,7 @@ You can include a partial template from within another template using the `@incl
 
 ```html
 {{-- In a user profile template --}}
-@include('users.header', ['headline' => 'User Profile'])
+@include('users/header', ['headline' => 'User Profile'])
 
 <p>User details...</p>
 ```
