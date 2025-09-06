@@ -7,6 +7,7 @@ use Elementary\Database\AbstractModel;
 use App\Repositories\UserRepository;
 use App\Repositories\UserRepositoryInterface;
 use Elementary\Template\Cigg\Engine as ElementaryEngine;
+use Elementary\Template\Cigg\LayoutManager;
 use Elementary\Utils\FlashBag;
 use Elementary\Utils\SessionBag;
 use Elementary\Template\Cigg\Lexer\Lexer;
@@ -38,13 +39,36 @@ $container->bind(QueryBuilder::class, fn(Container $c) => new QueryBuilder($c->g
 // Bind User Repository Interface
 $container->bind(UserRepositoryInterface::class, UserRepository::class);
 
+// Bind LayoutManager
+$container->bind(LayoutManager::class, LayoutManager::class);
+
+// Bind Template Engine
+$container->bind(ElementaryEngine::class, function (Container $c): ElementaryEngine {
+    $engine = new ElementaryEngine(
+        $c->get(ConfigBag::class),
+        $c->get(Lexer::class),
+        $c->get(Parser::class),
+        $c->get(Compiler::class),
+        $c->get(LayoutManager::class)
+    );
+
+    $engine->addGlobal('app_name', $c->get(ConfigBag::class)->get('app.name', 'MyApp'));
+
+    /** @var DirectiveRegistry $registry */
+    $registry = $c->get(DirectiveRegistry::class); // Ensure directives are registered
+    foreach ($registry->getAllDirectives() as $directive) {
+        $directive->setEngine($engine);
+    }
+
+    return $engine;
+});
 // Bind DirectiveRegistry with configured directives
 $container->bind(DirectiveRegistry::class, function(Container $c) {
     $registry = new DirectiveRegistry();
     $config = $c->get(ConfigBag::class);
     $directives = $config->get('template.directives', []);
 
-    foreach ($directives as $directiveClass) {
+    foreach ($directives as &$directiveClass) {
         // The container will create the directive instance if it's not already bound
         $directiveInstance = $c->get($directiveClass);
         $registry->register($directiveInstance);
@@ -53,19 +77,6 @@ $container->bind(DirectiveRegistry::class, function(Container $c) {
     return $registry;
 });
 
-// Bind Template Engine
-$container->bind(ElementaryEngine::class, function (Container $c): ElementaryEngine {
-    $engine = new ElementaryEngine(
-        $c->get(ConfigBag::class),
-        $c->get(Lexer::class),
-        $c->get(Parser::class),
-        $c->get(Compiler::class)
-    );
-
-    $engine->addGlobal('app_name', $c->get(ConfigBag::class)->get('app.name', 'MyApp'));
-
-    return $engine;
-});
 
 
 AbstractModel::setContainer($container);

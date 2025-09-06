@@ -15,26 +15,19 @@ use Elementary\Template\Cigg\Directives\DirectiveInterface;
  */
 class Engine
 {
-    private Lexer $lexer;
-    private Parser $parser;
-    private Compiler $compiler;
-
     private string $viewsPath;
     private string $cachePath;
     private array $globals = [];
 
     public function __construct(
-        ConfigBag $config,
-        Lexer $lexer,
-        Parser $parser,
-        Compiler $compiler
+        private ConfigBag $config,
+        private Lexer $lexer,
+        private Parser $parser,
+        private Compiler $compiler,
+        private LayoutManager $layoutManager
     ) {
         $this->viewsPath = rtrim($config->get('template.paths.views'), '/');
         $this->cachePath = rtrim($config->get('template.paths.cache'), '/');
-
-        $this->lexer = $lexer;
-        $this->parser = $parser;
-        $this->compiler = $compiler;
 
         // Ensure cache directory exists
         if (!is_dir($this->cachePath)) {
@@ -42,73 +35,89 @@ class Engine
         }
     }
 
+    public function getCachePath(): string
+    {
+        return $this->cachePath;
+    }
+
+    public function getViewsPath(): string
+    {
+        return $this->viewsPath;
+    }
+
+    public function resolveView(string $template): string
+    {
+        $templatePath = $this->viewsPath . '/' . str_replace('.', '/', $template) . '.cigg';
+
+        if (!file_exists($templatePath)) {
+            throw new \Exception("Template not found: {$templatePath}");
+        }
+
+        return $templatePath;
+    }
+
     /**
      * Render a template
      */
     public function render(string $template, array $data = []): string
     {
-        $templatePath = $this->viewsPath . '/' . $template . '.cigg';
-        
-        if (!file_exists($templatePath)) {
-            throw new \Exception("Template not found: {$template}");
+        if (!$this->layoutManager->isRenderingLayout()) {
+            $this->layoutManager->reset();
         }
 
+        $templatePath = $this->resolveView($template);
         $cacheKey = md5($templatePath);
         $cachePath = $this->cachePath . '/' . $cacheKey . '.php';
-        
-        // Check if we need to recompile
-        if (!file_exists($cachePath) || filemtime($templatePath) > filemtime($cachePath)) {
+
+        if ($this->isExpired($templatePath, $cachePath)) {
             $this->compileTemplate($templatePath, $cachePath);
         }
 
-        // Render the compiled template
-        return $this->renderCompiledTemplate($cachePath, array_merge($this->globals, $data));
+        $content = $this->renderCompiledTemplate($cachePath, array_merge($this->globals, $data));
+
+        if ($layout = $this->layoutManager->getLayout()) {
+            $this->layoutManager->clearLayout();
+            $this->layoutManager->setIsRenderingLayout(true);
+            $layoutContent = $this->render($layout, $data);
+            $this->layoutManager->setIsRenderingLayout(false);
+            return $layoutContent;
+        }
+
+        return $content;
     }
 
-    /**
-     * Register a custom directive class
-     */
-    public function directive(DirectiveInterface $directive): void
+    private function isExpired(string $templatePath, string $cachePath): bool
     {
-        $this->compiler->getDirectiveRegistry()->register($directive);
+        if ($this->config->get('app.env') !== 'production') {
+            return true;
+        }
+        if (!file_exists($cachePath)) {
+            return true;
+        }
+        return filemtime($templatePath) > filemtime($cachePath);
     }
 
-    /**
-     * Register a simple callable directive (Blade-style)
-     */
-    public function directiveCallable(string $name, callable $handler): void
+    public function compileTemplate(string $templatePath, string $cachePath): void
     {
-        $this->compiler->getDirectiveRegistry()->registerCallable($name, $handler);
+        $content = file_get_contents($templatePath);
+        $tokens = $this->lexer->tokenize($content);
+        $ast = $this->parser->parse($tokens);
+        $compiled = $this->compiler->compile($ast);
+        file_put_contents($cachePath, $compiled);
     }
 
-    /**
-     * Add global variable
-     */
     public function addGlobal(string $key, $value): void
     {
         $this->globals[$key] = $value;
     }
 
-    private function compileTemplate(string $templatePath, string $cachePath): void
-    {
-        $content = file_get_contents($templatePath);
-        
-        // Lexing
-        $tokens = $this->lexer->tokenize($content);
-        
-        // Parsing
-        $ast = $this->parser->parse($tokens);
-
-        // Compilation
-        $compiled = $this->compiler->compile($ast);
-
-        file_put_contents($cachePath, $compiled);
-    }
-
     private function renderCompiledTemplate(string $cachePath, array $data): string
     {
+        $data['__engine'] = $this;
+        $data['__layoutManager'] = $this->layoutManager;
+
         extract($data);
-        
+
         ob_start();
         include $cachePath;
         return ob_get_clean();

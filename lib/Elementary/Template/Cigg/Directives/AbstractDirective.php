@@ -7,10 +7,12 @@ namespace Elementary\Template\Cigg\Directives;
 use Elementary\Template\Cigg\AST\DirectiveNode;
 use Elementary\Template\Cigg\AST\Node;
 use Elementary\Template\Cigg\Compiler\CompilerInterface;
+use Elementary\Template\Cigg\Engine;
 
 abstract class AbstractDirective implements DirectiveInterface
 {
     protected ?CompilerInterface $compiler = null;
+    protected ?Engine $engine = null;
 
     public function isBlock(): bool
     {
@@ -20,6 +22,11 @@ abstract class AbstractDirective implements DirectiveInterface
     public function setCompiler(CompilerInterface $compiler): void
     {
         $this->compiler = $compiler;
+    }
+
+    public function setEngine(Engine $engine): void
+    {
+        $this->engine = $engine;
     }
     
     protected function compileChildren(DirectiveNode $node): string

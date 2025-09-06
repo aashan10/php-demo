@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Elementary\Template\Cigg\Parser;
 
+use Elementary\Template\Cigg\Directives\DirectiveRegistry;
 use Elementary\Template\Cigg\Token\Token;
 use Elementary\Template\Cigg\Token\TokenType;
 use Elementary\Template\Cigg\AST\Node;
@@ -19,6 +20,10 @@ class Parser
 {
     private array $tokens;
     private int $current = 0;
+
+    public function __construct(
+        private DirectiveRegistry $registry
+    ) {}
 
     public function parse(array $tokens): Node
     {
@@ -143,12 +148,20 @@ class Parser
 
     private function isBlockDirective(string $directive): bool
     {
-        return in_array($directive, ['if', 'foreach', 'for', 'while', 'switch', 'unless', 'section', 'component', 'card']);
+        foreach ($this->registry->getAllDirectives() as $dir) {
+            if ($dir->getName() === $directive && $dir->isBlock()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private function isEndingDirective(string $directive): bool
     {
-        return str_starts_with($directive, 'end') || in_array($directive, ['else', 'elseif']);
+        if (str_starts_with($directive, 'end')) {
+            return true;
+        }
+        return false;
     }
 
     private function peek(): Token
