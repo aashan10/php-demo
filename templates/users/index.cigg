@@ -1,38 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>{{ $app_name }}</title>
-        <style>
-        body { font-family: sans-serif; line-height: 1.6; padding: 20px; }
-        ul { list-style-type: none; padding: 0; }
-        li { background: #f4f4f4; margin: 5px 0; padding: 10px; border-radius: 5px; }
-        p { color: #888; }
-        </style>
-    </head>
-    <body>
-        <h1>User List</h1>
+@extends('layouts.app')
 
-        <div class="user-grid">
-            @foreach($users as $index => $user)
+@section('title')
+    Users List
+@endsection
+
+@section('content')
+    <style>
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .user-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        .user-card h3 {
+            margin-top: 0;
+        }
+
+        .user-card ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .user-card li {
+            background: #f4f4f4;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+
+    <h1>User List</h1>
+
+    <div class="user-grid">
+        @foreach ($users as $index => $user)
             <div class="user-card" data-index="{{ $index }}">
-                <h3>{{ $user["name"] }}</h3>
-                <p>Email: {{ $user["email"] }}</p>
+                <h3>{{ $user['name'] }}</h3>
+                <p>Email: {{ $user['email'] }}</p>
 
-                @if(isset($user["posts"]) && count($user["posts"]) > 0)
-                <h4>Recent Posts:</h4>
-                <ul>
-                    @foreach($user["posts"] as $post)
-                    <li>
-                        <strong>{{ $post["title"] }}</strong>
-                        <br>
-                        <small>{{ $post["date"] }}</small>
-                    </li>
-                    @endforeach
-                </ul>
+                @if (isset($user['posts']) && count($user['posts']) > 0)
+                    <h4>Recent Posts:</h4>
+                    <ul>
+                        @foreach ($user['posts'] as $post)
+                            <li>
+                                <strong>{{ $post['title'] }}</strong>
+                                <br>
+                                <small>{{ $post['date'] }}</small>
+                            </li>
+                        @endforeach
+                    </ul>
                 @endif
             </div>
-            @endforeach
-        </div>
-    </body>
-</html>
+        @endforeach
+    </div>
+@endsection
