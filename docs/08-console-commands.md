@@ -4,7 +4,9 @@ The Elementary framework includes a command-line interface that allows you to ru
 
 ## Creating a Command
 
-To create a new command, create a new PHP class in the `src/Console/Commands` directory. The class should have two main components:
+To create a new command, create a new PHP class in the `src/Console/Commands` directory. It's recommended that your command extends `Elementary\Console\AbstractCommand` to gain access to helpful output methods.
+
+The class should have two main components:
 
 1.  A static property `$defaultName` which defines the command's name.
 2.  An `execute()` method which contains the logic for the command.
@@ -14,13 +16,15 @@ To create a new command, create a new PHP class in the `src/Console/Commands` di
 
 namespace App\Console\Commands;
 
-final class HelloWorldCommand
+use Elementary\Console\AbstractCommand; // Don't forget to import!
+
+class HelloWorldCommand extends AbstractCommand
 {
     public static string $defaultName = 'app:hello-world';
 
     public function execute(array $args): int
     {
-        echo "Hello, World!\n";
+        $this->info("Hello, World!"); // Using the new helper method
 
         // Return 0 for success
         return 0;
@@ -44,13 +48,35 @@ Then, from within the container, you can run your command:
 php elementary app:hello-world
 ```
 
-### Listing Commands
+### Listing Commands and Help
 
-If you run the `elementary` script without any arguments, it will display a list of all available commands.
+To see a list of all available commands, you can run:
 
 ```bash
 php elementary
+# or
+php elementary help
 ```
+
+### Useful Commands
+
+Beyond your custom commands, the framework provides some built-in utilities:
+
+*   **`templates:compile`**: Compiles all Cigg templates into their cached PHP forms. This is highly recommended for production environments to improve performance and simplify deployment.
+    ```bash
+    php elementary templates:compile
+    ```
+
+## Command Output Helpers
+
+When your command extends `Elementary\Console\AbstractCommand`, you gain access to several convenient methods for printing formatted output to the console:
+
+*   **`$this->line(string $text)`**: Prints a plain line of text.
+*   **`$this->info(string $text)`**: Prints an informational message in blue, prefixed with `[INFO]:`.
+*   **`$this->success(string $text)`**: Prints a success message in green, prefixed with `[SUCCESS]:`.
+*   **`$this->warning(string $text)`**: Prints a warning message in yellow, prefixed with `[WARNING]:`.
+*   **`$this->error(string $text)`**: Prints an error message in red, prefixed with `[ERROR]:`.
+*   **`$this->table(array $headers, array $rows)`**: Renders tabular data with automatically calculated column widths and borders.
 
 ## Example: 1BRC Command
 

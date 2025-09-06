@@ -2,10 +2,7 @@
 
 // session_start(); // This is now handled by the StartSession middleware
 
-define('BASE_PATH', __DIR__ . '/..');
-define('TEMPLATE_PATH', BASE_PATH . '/templates');
-define('CACHE_PATH', BASE_PATH . '/cache');
-define('PUBLIC_PATH', __DIR__);
+require_once __DIR__ . '/../constants.php';
 
 require_once BASE_PATH . '/vendor/autoload.php';
 

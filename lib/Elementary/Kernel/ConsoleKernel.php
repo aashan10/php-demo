@@ -84,7 +84,17 @@ class ConsoleKernel implements KernelInterface
         }
     }
 
-    public function handle(Request $request): Response
+    private function displayHelp(): void
+    {
+        echo "Usage: elementary <command>\n\n";
+        echo "Available commands:\n";
+        ksort($this->cliCommands); // Sort commands alphabetically
+        foreach ($this->cliCommands as $name => $fqcn) {
+            echo "  - {$name}\n";
+        }
+    }
+
+    public function handle(): Response
     {
         // Not applicable for ConsoleKernel
         throw new \BadMethodCallException("handle not implemented for ConsoleKernel");
@@ -93,27 +103,21 @@ class ConsoleKernel implements KernelInterface
     public function handleCli(array $argv): int
     {
         if (!isset($this->container)) {
-            $this->bootstrap(); // Ensure bootstrap is called if not already
+            $this->bootstrap();
         }
 
         $commandName = $argv[1] ?? null;
 
-        if ($commandName === null) {
-            echo "Usage: elementary <command>\n";
-            echo "Available commands:\n";
-            foreach ($this->cliCommands as $name => $fqcn) {
-                echo "  - " . $name . "\n";
-            }
-            return 1;
+        // Handle help command or no command
+        if ($commandName === null || $commandName === 'help') {
+            $this->displayHelp();
+            return 0; // Success
         }
 
         if (!isset($this->cliCommands[$commandName])) {
-            echo "Unknown command: {$commandName}\n";
-            echo "Available commands:\n";
-            foreach ($this->cliCommands as $name => $fqcn) {
-                echo "  - " . $name . "\n";
-            }
-            return 1;
+            echo "Error: Unknown command '{$commandName}'\n\n";
+            $this->displayHelp();
+            return 1; // Error
         }
 
         try {
@@ -123,7 +127,7 @@ class ConsoleKernel implements KernelInterface
             $statusCode = $command->execute(array_slice($argv, 2));
             $endtime    = microtime(true);
             $duration   = $endtime - $startTime;
-            echo "Execution time: " . number_format($duration, 2) . " seconds\n";
+            echo "\nExecution time: " . number_format($duration, 4) . " seconds\n";
             return $statusCode;
         } catch (\Throwable $e) {
             echo "Error: " . $e->getMessage() . "\n";
@@ -131,7 +135,7 @@ class ConsoleKernel implements KernelInterface
         }
     }
 
-    public function terminate(Request $request, Response $response): void
+    public function terminate(Response $response): void
     {
         // Not applicable for ConsoleKernel
         throw new \BadMethodCallException("terminate not implemented for ConsoleKernel");

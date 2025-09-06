@@ -27,7 +27,7 @@ final class OneBillionRowsChallengeCommand
             } else {
                 $map[$city] = [
                     'sum' => (float)$temperature,
-                    'count': 1
+                    'count'=> 1
                 ];
             }
 
