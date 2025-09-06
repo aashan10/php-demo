@@ -88,11 +88,12 @@ class Engine
 
     private function isExpired(string $templatePath, string $cachePath): bool
     {
-        $env = $this->config->get('app.env', 'dev');
-        if (!str_starts_with($env, 'prod')) {
+        if (!file_exists($cachePath)) {
             return true;
         }
-        if (!file_exists($cachePath)) {
+
+        $env = $this->config->get('app.env', 'dev');
+        if (!str_starts_with($env, 'prod')) {
             return true;
         }
         return filemtime($templatePath) > filemtime($cachePath);

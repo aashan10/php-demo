@@ -51,6 +51,70 @@ Cigg supports `@foreach` loops to iterate over arrays.
 </ul>
 ```
 
+### Executing Raw PHP
+
+While it's best to keep logic in controllers, you can execute raw PHP code in your templates using the `@php` and `@endphp` directives.
+
+```html
+@php
+    // You can write any PHP code here.
+    $message = 'This is a raw PHP block.';
+@endphp
+
+<p>{{ $message }}</p>
+```
+
+## Template Inheritance & Includes
+
+Cigg makes it easy to build complex layouts and include partial templates.
+
+### Defining a Layout
+
+Layouts are defined using `@section` and `@yield`. The `@yield` directive is used to display the contents of a section, while `@section` defines a piece of content.
+
+Here is an example of a main layout file (`layouts/app.cigg`):
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@yield('title', 'My App')</title>
+</head>
+<body>
+    <div class="container">
+        @yield('content')
+    </div>
+</body>
+</html>
+```
+
+### Extending a Layout
+
+You can extend a layout using the `@extends` directive. You can then inject content into the layout's sections using `@section` blocks.
+
+```html
+@extends('layouts.app')
+
+@section('title')
+    My Page Title
+@endsection
+
+@section('content')
+    <p>This is the content for my page.</p>
+@endsection
+```
+
+### Including Partials
+
+You can include a partial template from within another template using the `@include` directive. All variables from the parent template will be available to the included template.
+
+```html
+{{-- In a user profile template --}}
+@include('users.header', ['headline' => 'User Profile'])
+
+<p>User details...</p>
+```
+
 ## Custom Directives
 
 The Cigg engine is extensible. You can add your own custom directives.
