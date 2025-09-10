@@ -6,24 +6,35 @@ namespace Elementary\Authentication\Traits;
 
 trait Authenticatable 
 {
-    protected static string $idColumn = 'id';
-    protected static string $usernameColumn = 'username';
-    protected static string $passwordColumn = 'password';
-
 
     public function getId(): int|string
     {
-        return $this->{self::$idColumn};
+        return $this->{$this->getIdColumn()};
     }
 
     public function getUsername(): string
     {
-        return $this->{self::$usernameColumn};
+        return $this->{$this->getUsernameColumn()};
     }
 
     public function getPasswordHash(): string
     {
-        return $this->{self::$passwordColumn};
+        return $this->{$this->getPasswordColumn()};
+    }
+
+    public function getUsernameColumn(): string
+    {
+        return self::$usernameColumn ?? 'username';
+    }
+
+    public function getIdColumn(): string
+    {
+        return self::$idColumn ?? 'id';
+    }
+
+    public function getPasswordColumn(): string
+    {
+        return self::$passwordColumn ?? 'password';
     }
 }
 

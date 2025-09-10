@@ -1,7 +1,7 @@
 <?php
 
-use App\Middleware\StartSession;
-use App\Middleware\TrimStrings;
+use Elementary\Http\Middleware\StartSession;
+use Elementary\Http\Middleware\TrimStrings;
 use Elementary\Http\Middleware\EncryptCookies;
 use Elementary\Authentication\Middleware\AuthenticateApiMiddleware;
 use Elementary\Authentication\Middleware\AuthenticateCookieMiddleware;

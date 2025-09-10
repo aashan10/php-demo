@@ -87,7 +87,7 @@ class HttpKernel implements KernelInterface
         } catch (\Throwable $e) {
             $config = $this->container->get(ConfigBag::class);
 
-            if ($config->get('app.env') === 'development') {
+            if (str_starts_with( $config->get('app.env', 'dev') , 'dev')) {
                 throw $e;
             }
 
