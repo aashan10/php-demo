@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Elementary\Authentication\Middleware;
 
-use App\Models\User;
-use App\Repositories\UserRepositoryInterface;
 use Elementary\Authentication\UserInterface;
+use Elementary\Config\ConfigBag;
 use Elementary\Http\Middleware\MiddlewareInterface;
 use Elementary\Http\Request;
 use Elementary\Http\Response;
 
 final class AuthenticateCookieMiddleware implements MiddlewareInterface
 {
-    public function __construct(private UserRepositoryInterface $userRepository)
+    public function __construct(private ConfigBag $config)
     {
     }
 
@@ -41,8 +40,9 @@ final class AuthenticateCookieMiddleware implements MiddlewareInterface
             return $next($request);
         }
 
-        /** @var User|null $user */
-        $user = User::find((int) $userId);
+        $userModelClass = $this->config->get('auth.model');
+        /** @var \App\Models\User|null $user */
+        $user = $userModelClass::find((int) $userId);
 
         if (!$user || !$user->remember_token || !hash_equals($user->remember_token, $token)) {
             return $next($request);

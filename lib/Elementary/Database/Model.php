@@ -6,9 +6,9 @@ namespace Elementary\Database;
 
 use Elementary\DI\Container;
 
-abstract class AbstractModel
+abstract class Model
 {
-    protected static string $tableName;
+    protected static string $table;
     protected static string $primaryKey = 'id';
     protected static ?Container $container = null;
 

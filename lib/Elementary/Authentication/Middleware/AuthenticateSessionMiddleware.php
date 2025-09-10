@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace Elementary\Authentication\Middleware;
 
 use Elementary\Authentication\UserInterface;
+use Elementary\Config\ConfigBag;
 use Elementary\Http\Middleware\MiddlewareInterface;
 use Elementary\Http\Request;
 use Elementary\Http\Response;
-use Elementary\Model\User;
 
 final class AuthenticateSessionMiddleware implements MiddlewareInterface
 {
+    public function __construct(private ConfigBag $config)
+    {
+    }
+
     public function process(Request $request, callable $next): Response
     {
         if ($request->user instanceof UserInterface) {
@@ -24,7 +28,8 @@ final class AuthenticateSessionMiddleware implements MiddlewareInterface
             return new Response(302, '', ['Location' => '/login']);
         }
 
-        $user = User::find($session->get('user_id'));
+        $userModelClass = $this->config->get('auth.model');
+        $user = $userModelClass::find($session->get('user_id'));
 
         if (!$user instanceof UserInterface) {
             $session->remove('user_id');

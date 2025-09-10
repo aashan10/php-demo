@@ -3,7 +3,7 @@
 use Elementary\Config\ConfigBag;
 use Elementary\Database\Connection;
 use Elementary\DI\Container;
-use Elementary\Database\AbstractModel;
+use Elementary\Database\Model;
 use App\Repositories\UserRepository;
 use App\Repositories\UserRepositoryInterface;
 use Elementary\Template\Cigg\Engine as ElementaryEngine;
@@ -57,8 +57,7 @@ $container->bind(EncryptionService::class, fn(Container $c) => new EncryptionSer
 // Bind SessionManager
 $container->bind(SessionManager::class, fn(Container $c) => new SessionManager($c->get(ConfigBag::class), $c->get(Connection::class)));
 
-// Bind User Repository Interface
-$container->bind(UserRepositoryInterface::class, UserRepository::class);
+
 
 // Bind LayoutManager
 $container->bind(LayoutManager::class, LayoutManager::class);
@@ -101,4 +100,4 @@ $container->bind(DirectiveRegistry::class, function(Container $c) {
 
 
 
-AbstractModel::setContainer($container);
+Model::setContainer($container);
