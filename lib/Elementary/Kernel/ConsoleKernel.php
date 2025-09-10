@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Elementary\Kernel;
 
 use Elementary\Config\ConfigBag;
+use Elementary\Console\Commands\SessionCleanCommand;
+use Elementary\Console\Commands\TemplateCompileCommand;
 use Elementary\Database\Connection;
 use Elementary\DI\Container;
 use Elementary\Http\Request;
@@ -13,17 +15,23 @@ use Elementary\Http\Router;
 // Removed App\Models\AbstractModel, App\Repositories\UserRepository, App\Repositories\UserRepositoryInterface
 use Elementary\Utils\FlashBag;
 use Elementary\Utils\SessionBag;
+use Elementary\Utils\Traits\BetterTry;
 use ReflectionClass;
 use Whoops\Run;
 use Whoops\Handler\PlainTextHandler;
 
 class ConsoleKernel implements KernelInterface
 {
+    use BetterTry;
     private Container $container;
     private array $cliCommands = [];
 
     public function __construct()
     {
+        $this->cliCommands = [
+            $this->getCommandName(TemplateCompileCommand::class) => TemplateCompileCommand::class,
+            $this->getCommandName(SessionCleanCommand::class)    => SessionCleanCommand::class,
+        ];
         // Constructor is empty, bootstrap will set up the container
     }
 
@@ -75,16 +83,48 @@ class ConsoleKernel implements KernelInterface
             $fqcn = 'App\\Console\\Commands\\' . $className;
 
             if (class_exists($fqcn)) {
-                $reflectionClass = new ReflectionClass($fqcn);
-                if ($reflectionClass->hasProperty('defaultName') && $reflectionClass->getProperty('defaultName')->isStatic()) {
-                    $commandName = $reflectionClass->getStaticPropertyValue('defaultName');
-                    $this->cliCommands[$commandName] = $fqcn;
+                [$command, $error] = $this->try(fn() => $this->getCommandName($fqcn));
+                if (!$error && $command) {
+                    $this->cliCommands[$command] = $fqcn;
                 }
             }
         }
     }
+    private function getCommandName(string $fqcn): string 
+    {
+        $reflectionClass = new ReflectionClass($fqcn);
+        if ($reflectionClass->hasProperty('signature') && $reflectionClass->getProperty('signature')->isStatic()) {
+            $commandName = $reflectionClass->getStaticPropertyValue('signature');
+            [$command] = explode(' ', $commandName); // Validate format
+            return $command;
+        }
+        throw new \InvalidArgumentException("Class {$fqcn} does not have a valid static 'signature' property.");
+    }
 
-    private function displayHelp(): void
+    private function displayHelp(?string $commandClass = null): void
+    {
+        if (null === $commandClass) {
+            $this->displayAppHelp();
+            return;
+        }
+        $fqcn = $this->cliCommands[$commandClass] ?? null;
+        if ($fqcn === null) {
+            echo "Error: Unknown command '{$commandClass}'.\n\n";
+            $this->displayAppHelp();
+            return;
+        }
+        $reflectionClass = new ReflectionClass($fqcn);
+        if ($reflectionClass->hasProperty('description') && $reflectionClass->getProperty('description')->isStatic()) {
+            $description = $reflectionClass->getStaticPropertyValue('description');
+        } else {
+            $description = 'No description available.';
+        }
+        $signature = $reflectionClass->getStaticPropertyValue('signature');
+        echo "Usage: elementary {$signature}\n\n";
+        echo "{$description}\n";
+    }
+
+    private function displayAppHelp(): void 
     {
         echo "Usage: elementary <command>\n\n";
         echo "Available commands:\n";
@@ -114,11 +154,28 @@ class ConsoleKernel implements KernelInterface
             return 0; // Success
         }
 
-        if (!isset($this->cliCommands[$commandName])) {
-            echo "Error: Unknown command '{$commandName}'\n\n";
+        $help = false;
+
+        foreach ($argv as $arg) {
+            if (in_array($arg, ['-h', '--help'], true)) {
+                $help = true;
+                break;
+            }
+        }
+        if ($help) {
+            $this->displayHelp($commandName);
+            return 0; // Success
+        }
+
+
+        $commandClass = $this->cliCommands[$commandName] ?? null;
+
+        if ($commandClass === null) {
+            echo "Error: Unknown command '{$commandName}'.\n\n";
             $this->displayHelp();
             return 1; // Error
         }
+
 
         try {
             /** @var object $command */
