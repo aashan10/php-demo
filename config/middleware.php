@@ -1,8 +1,12 @@
 <?php
 
-use App\Middleware\Authenticate;
 use App\Middleware\StartSession;
 use App\Middleware\TrimStrings;
+use Elementary\Http\Middleware\EncryptCookies;
+use Elementary\Authentication\Middleware\AuthenticateApiMiddleware;
+use Elementary\Authentication\Middleware\AuthenticateCookieMiddleware;
+use Elementary\Authentication\Middleware\AuthenticateSessionMiddleware;
+use Elementary\Http\Middleware\VerifyCsrfToken;
 
 return [
     /*
@@ -16,7 +20,6 @@ return [
     */
     'aliases' => [
         'trim' => TrimStrings::class,
-        'auth' => Authenticate::class,
     ],
 
     /*
@@ -31,11 +34,18 @@ return [
     */
     'groups' => [
         'web' => [
+            EncryptCookies::class,
             StartSession::class,
+            VerifyCsrfToken::class,
             TrimStrings::class,
         ],
         'api' => [
             // Middleware for API routes can be added here
+        ],
+        'auth' => [
+            AuthenticateSessionMiddleware::class,
+            AuthenticateCookieMiddleware::class,
+            AuthenticateApiMiddleware::class,
         ]
     ]
 ];

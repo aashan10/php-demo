@@ -13,6 +13,7 @@ use Elementary\Routing\Router;
 use Elementary\Http\MiddlewareDispatcher;
 use Elementary\Utils\FlashBag;
 use Elementary\Utils\SessionBag;
+use Psr\Container\ContainerInterface;
 use Whoops\Run;
 use Whoops\Handler\PrettyPageHandler;
 
@@ -31,21 +32,23 @@ class HttpKernel implements KernelInterface
         $this->container->bind(ConfigBag::class, fn() => new ConfigBag(BASE_PATH . '/config'));
         $config = $this->container->get(ConfigBag::class);
 
-        if ($config->get('app.env') === 'development') {
+        if (str_starts_with($config->get('app.env', 'dev'), 'dev')) {
             $whoops = new Run();
             $whoops->pushHandler(new PrettyPageHandler());
             $whoops->register();
         }
 
+        $request = Request::createFromGlobals();
+
         $this->container->bind(SessionBag::class, fn() => new SessionBag());
         $this->container->bind(FlashBag::class, fn(Container $c) => new FlashBag($c->get(SessionBag::class)));
         $this->container->bind(Connection::class, fn(Container $c) => new Connection($c->get(ConfigBag::class)));
-        $this->container->bind(Request::class, fn() => Request::createFromGlobals());
+        $this->container->bind(Request::class, fn() => $request);
+        $this->container->bind(ContainerInterface::class, fn() => $this->container);
 
         $container = $this->container;
         require_once BASE_PATH . '/bootstrap.php';
 
-        require_once BASE_PATH . '/routes/web.php';
         Router::middleware('web')->group(function () {
             require_once BASE_PATH . '/routes/web.php';
         });

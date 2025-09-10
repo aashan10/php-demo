@@ -1,0 +1,41 @@
+@extends('layouts/guest')
+
+@section('title')
+    Login
+@endsection
+
+@section('content')
+    <h1>Login</h1>
+
+    @if (isset($errors))
+        <div style="color: red;">
+            <ul>
+                @foreach ($errors as $field => $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+    
+    @flash('error')
+
+    <form action="/login" method="post">
+        @csrf
+        <div>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{ $old['email'] ?? '' }}" required>
+        </div>
+        <div>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div>
+            <input type="checkbox" id="remember" name="remember" value="1">
+            <label for="remember">Remember Me</label>
+        </div>
+        <div>
+            <button type="submit">Login</button>
+        </div>
+    </form>
+    <p>Don't have an account? <a href="/register">Register here</a>.</p>
+@endsection

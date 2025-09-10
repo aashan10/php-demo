@@ -1,0 +1,66 @@
+@extends('layouts/app')
+
+@section('title')
+    Create User
+@endsection
+
+@section('body')
+    <h1>Create User</h1>
+
+
+    <form action="/users/create" method="post">
+        <div>
+            <label for="first_name">First Name</label>
+            <input type="text" id="first_name" name="first_name" value="{{ $old['first_name'] ?? '' }}">
+            @if ($errors->has('first_name'))
+                @foreach ($errors->get('first_name')->all() as $error)
+                    <div style="color: red;">{{ $error }}</div>
+                @endforeach
+            @endif
+        </div>
+        <div>
+            <label for="last_name">Last Name</label>
+            <input type="text" id="last_name" name="last_name" value="{{ $old['last_name'] ?? '' }}">
+
+            @if ($errors->has('last_name'))
+                @foreach ($errors->get('last_name')->all() as $error)
+                    <div style="color: red;">{{ $error }}</div>
+                @endforeach
+            @endif
+        </div>
+        <div>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{ $old['email'] ?? '' }}">
+
+            @if ($errors->has('email'))
+                @foreach ($errors->get('email')->all() as $error)
+                    <div style="color: red;">{{ $error }}</div>
+                @endforeach
+            @endif
+        </div>
+        <div>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password">
+
+            @if ($errors->has('password'))
+                @foreach ($errors->get('password')->all() as $error)
+                    <div style="color: red;">{{ $error }}</div>
+                @endforeach
+            @endif
+        </div>
+        <div>
+            <label for="password_confirmation">Confirm Password</label>
+            <input type="password" id="password_confirmation" name="password_confirmation">
+
+            @if ($errors->has('password_confirmation'))
+                @foreach ($errors->get('password_confirmation')->all() as $error)
+                    <div style="color: red;">{{ $error }}</div>
+                @endforeach
+            @endif
+        </div>
+        <div>
+            <button type="submit">Create</button>
+        </div>
+    </form>
+@endsection
+

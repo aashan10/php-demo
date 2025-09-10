@@ -9,19 +9,10 @@ use Elementary\Database\AbstractModel;
 /**
  * Represents a User in the application.
  */
-final class User extends AbstractModel
+final class User extends \Elementary\Model\User 
 {
-    protected static string $tableName = 'users';
+    protected static string $usernameColumn = 'email';
 
-    public int    $id;
-    public string $first_name;
-    public string $last_name;
-    public string $email;
-    public string $password; 
-    public string $profile_picture;
-    public bool   $is_active;
-    public string $created_at;
-    public string $updated_at;
 
 
     /**

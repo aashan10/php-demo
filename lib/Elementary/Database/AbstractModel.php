@@ -12,6 +12,8 @@ abstract class AbstractModel
     protected static string $primaryKey = 'id';
     protected static ?Container $container = null;
 
+    private array  $__data = [];
+
     public static function setContainer(Container $container): void
     {
         self::$container = $container;
@@ -22,7 +24,7 @@ abstract class AbstractModel
         /** @var QueryBuilder $builder */
         $builder = self::getContainer()->get(QueryBuilder::class);
 
-        return $builder->table(static::$tableName)
+        return $builder->table(static::$table)
                        ->setModel(static::class)
                        ->setPrimaryKey(static::$primaryKey);
     }
@@ -45,7 +47,7 @@ abstract class AbstractModel
     public function update(array $data): int
     {
         $primaryKey = static::$primaryKey;
-        if (!isset($this->$primaryKey)) {
+        if (!isset($this->__data[$primaryKey])) {
             throw new \RuntimeException("Cannot update a model without a primary key value.");
         }
 
@@ -77,5 +79,15 @@ abstract class AbstractModel
             throw new \RuntimeException("Container not set on AbstractModel. Call AbstractModel::setContainer() first.");
         }
         return self::$container;
+    }
+
+    public function __set($name, $value)
+    {
+        $this->__data[$name] = $value;
+    }
+
+    public function __get($name)
+    {
+        return $this->__data[$name] ?? null;
     }
 }

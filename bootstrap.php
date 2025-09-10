@@ -15,6 +15,9 @@ use Elementary\Template\Cigg\Parser\Parser;
 use Elementary\Template\Cigg\Directives\DirectiveRegistry;
 use Elementary\Template\Cigg\Compiler\Compiler;
 use Elementary\Validation\Validator;
+use Elementary\Database\QueryBuilder;
+use Elementary\Utils\EncryptionService;
+use Elementary\Session\SessionManager;
 
 Validator::macro('validateName', function ($data) {
     /** @var Validator $this */
@@ -46,8 +49,13 @@ $container->bind(FlashBag::class, fn() => $flashBag);
 $container->bind(Connection::class, fn(Container $c) => new Connection($c->get(ConfigBag::class)));
 
 // Bind Query Builder
-use Elementary\Database\QueryBuilder;
 $container->bind(QueryBuilder::class, fn(Container $c) => new QueryBuilder($c->get(Connection::class)->getInstance()));
+
+// Bind EncryptionService
+$container->bind(EncryptionService::class, fn(Container $c) => new EncryptionService($c->get(ConfigBag::class)));
+
+// Bind SessionManager
+$container->bind(SessionManager::class, fn(Container $c) => new SessionManager($c->get(ConfigBag::class), $c->get(Connection::class)));
 
 // Bind User Repository Interface
 $container->bind(UserRepositoryInterface::class, UserRepository::class);
@@ -62,7 +70,8 @@ $container->bind(ElementaryEngine::class, function (Container $c): ElementaryEng
         $c->get(Lexer::class),
         $c->get(Parser::class),
         $c->get(Compiler::class),
-        $c->get(LayoutManager::class)
+        $c->get(LayoutManager::class),
+        $c
     );
 
     $engine->addGlobal('app_name', $c->get(ConfigBag::class)->get('app.name', 'MyApp'));
