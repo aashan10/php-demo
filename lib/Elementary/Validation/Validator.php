@@ -4,16 +4,22 @@ declare(strict_types=1);
 
 namespace Elementary\Validation;
 
+use Elementary\Traits\Macroable;
+use Elementary\Utils\ParameterBag;
+
 class Validator
 {
+    use Macroable;
+
     private array $data;
     private array $rules;
-    private array $errors = [];
+    private ParameterBag $errors;
 
     public function __construct(array $data, array $rules)
     {
         $this->data = $data;
         $this->rules = $rules;
+        $this->errors = new ParameterBag();
     }
 
     public function passes(): bool
@@ -26,7 +32,7 @@ class Validator
             }
         }
 
-        return empty($this->errors);
+        return $this->errors->isEmpty();
     }
 
     public function fails(): bool
@@ -34,7 +40,7 @@ class Validator
         return !$this->passes();
     }
 
-    public function errors(): array
+    public function errors(): ParameterBag
     {
         return $this->errors;
     }
@@ -48,16 +54,15 @@ class Validator
 
         $methodName = 'validate' . ucfirst($ruleName);
 
-        if (method_exists($this, $methodName)) {
-            $this->$methodName($field, $value, $ruleParam);
-        }
+        $this->callMacro($methodName, [$field, $value, $ruleParam]);
     }
 
     private function addError(string $field, string $message): void
     {
-        if (!isset($this->errors[$field])) {
-            $this->errors[$field] = $message;
-        }
+        $errorBag = $this->errors->get($field, new ParameterBag());
+        $errorBag->set($field, $message);
+
+        $this->errors->set($field, $errorBag);
     }
 
     // --- Validation Rules ---
@@ -80,6 +85,13 @@ class Validator
     {
         if (!empty($value) && strlen(trim($value)) < (int)$length) {
             $this->addError($field, "The {$field} must be at least {$length} characters.");
+        }
+    }
+
+    private function validateEquals(string $field, mixed $value, string $otherField): void
+    {
+        if (!empty($value) && $value !== ($this->data[$otherField] ?? null)) {
+            $this->addError($field, "The {$field} must match the {$otherField} field.");
         }
     }
 }

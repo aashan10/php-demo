@@ -14,6 +14,19 @@ use Elementary\Template\Cigg\Lexer\Lexer;
 use Elementary\Template\Cigg\Parser\Parser;
 use Elementary\Template\Cigg\Directives\DirectiveRegistry;
 use Elementary\Template\Cigg\Compiler\Compiler;
+use Elementary\Validation\Validator;
+
+Validator::macro('validateName', function ($data) {
+    /** @var Validator $this */
+    [$field, $value,  $params ] = $data;
+
+    $parts = explode(' ', $value);
+
+    if (count($parts) < 2) {
+        $this->addError($field, 'Name must be at least two words long!' );
+    }
+});
+
 
 /** @var Container $container */
 
