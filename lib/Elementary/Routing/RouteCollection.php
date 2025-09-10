@@ -43,4 +43,9 @@ class RouteCollection
     {
         return $this->routes;
     }
+
+    public function getByName(string $name): ?Route 
+    {
+        return $this->namedRoutes[$name] ?? null;
+    }
 }

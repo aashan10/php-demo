@@ -136,4 +136,13 @@ class Router
 
         return null;
     }
+
+    public static function url(Route $route, array $params = []): string 
+    {
+        $uri = $route->uri;
+        foreach ($params as $key => $value) {
+            $uri = str_replace('{' . $key . '}', (string)$value, $uri);
+        }
+        return '/' . ltrim($uri, '/');
+    }
 }

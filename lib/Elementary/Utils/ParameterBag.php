@@ -33,4 +33,13 @@ class ParameterBag {
     public function clear(): void {
         $this->parameters = [];
     }
+
+    public function only(array $keys): array 
+    {
+        return array_intersect_key($this->parameters, array_flip($keys));
+    }
+
+    public function isEmpty(): bool {
+        return empty($this->parameters);
+    }
 }

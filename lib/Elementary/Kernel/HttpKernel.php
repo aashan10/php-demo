@@ -46,6 +46,9 @@ class HttpKernel implements KernelInterface
         require_once BASE_PATH . '/bootstrap.php';
 
         require_once BASE_PATH . '/routes/web.php';
+        Router::middleware('web')->group(function () {
+            require_once BASE_PATH . '/routes/web.php';
+        });
     }
 
     public function handle(): Response
@@ -108,15 +111,38 @@ class HttpKernel implements KernelInterface
 
     private function dispatchController(callable|string $controller, Request $request): Response
     {
+        $action = null;
         if (is_string($controller)) {
             [$className, $methodName] = explode('@', $controller);
             $object = $this->container->get($className);
             if (!method_exists($object, $methodName)) {
                 return new Response(500, "Method {$methodName} not found in {$className}");
             }
-            return $object->{$methodName}($request);
+            $action =  [$object, $methodName];
+        } else {
+            $action = $controller;
         }
-        return $controller($request);
+
+        $reflection = new \ReflectionFunction(\Closure::fromCallable($action));
+        $parameters = $reflection->getParameters();
+        $args = [];
+        foreach ($parameters as $parameter) {
+            $paramType = $parameter->getType();
+            if ($paramType && !$paramType->isBuiltin()) {
+                $paramClass = $paramType->getName();
+                if ($paramClass === Request::class) {
+                    $args[] = $request;
+                } else {
+                    $args[] = $this->container->get($paramClass);
+                }
+            } elseif ($parameter->isDefaultValueAvailable()) {
+                $args[] = $parameter->getDefaultValue();
+            } else {
+                // Cannot resolve the parameter
+                throw new \RuntimeException("Cannot resolve parameter \${$parameter->getName()}");
+            }
+        }
+        return $action(...$args);
     }
 
     private function resolveMiddleware(array $aliases): array

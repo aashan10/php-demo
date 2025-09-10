@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Elementary\Http;
 
+use Elementary\Authentication\UserInterface;
 use Elementary\Utils\ParameterBag;
 use Elementary\Utils\SessionBag;
 use Elementary\Utils\UploadedFile;
@@ -19,6 +20,7 @@ final class Request {
     public readonly ParameterBag $attributes;
     public readonly ParameterBag $request;
     public readonly SessionBag $session;
+    public ?UserInterface $user = null;
     public readonly ?string $content;
 
 

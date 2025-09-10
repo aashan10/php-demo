@@ -6,6 +6,7 @@ return [
     ],
     'directives' => [
         \Elementary\Template\Cigg\Directives\BuiltIn\PhpDirective::class,
+        \Elementary\Template\Cigg\Directives\BuiltIn\FlashDirective::class,
         \Elementary\Template\Cigg\Directives\BuiltIn\IncludeDirective::class,
         \Elementary\Template\Cigg\Directives\BuiltIn\CsrfDirective::class,
         \Elementary\Template\Cigg\Directives\BuiltIn\JsonDirective::class,

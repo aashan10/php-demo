@@ -6,6 +6,7 @@ namespace Elementary\Template\Cigg\Directives\BuiltIn;
 
 use Elementary\Template\Cigg\Directives\AbstractDirective;
 use Elementary\Template\Cigg\AST\DirectiveNode;
+use Elementary\Utils\Csrf;
 
 /**
  * CSRF token directive
@@ -19,6 +20,7 @@ class CsrfDirective extends AbstractDirective
     
     public function compile(DirectiveNode $node): string
     {
-        return '<input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">';
+        $csrfClass = Csrf::class;
+        return "<input type=\"hidden\" name=\"_token\" value=\"<?php echo \$__container->get('{$csrfClass}')->getToken(); ?>\">";
     }
 }

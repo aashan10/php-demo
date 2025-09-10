@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Elementary\Template\Cigg;
 
 use Elementary\Config\ConfigBag;
+use Elementary\DI\Container;
 use Elementary\Template\Cigg\Lexer\Lexer;
 use Elementary\Template\Cigg\Parser\Parser;
 use Elementary\Template\Cigg\Compiler\Compiler;
@@ -24,7 +25,8 @@ class Engine
         private Lexer $lexer,
         private Parser $parser,
         private Compiler $compiler,
-        private LayoutManager $layoutManager
+        private LayoutManager $layoutManager,
+        private Container $container,
     ) {
         $this->viewsPath = rtrim($config->get('template.paths.views'), '/');
         $this->cachePath = rtrim($config->get('template.paths.cache'), '/');
@@ -117,6 +119,7 @@ class Engine
     {
         $data['__engine'] = $this;
         $data['__layoutManager'] = $this->layoutManager;
+        $data['__container'] = $this->container;
 
         extract($data);
 

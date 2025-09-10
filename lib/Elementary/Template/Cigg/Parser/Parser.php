@@ -88,7 +88,12 @@ class Parser
         $expression = '';
         if ($this->peek()->type === TokenType::T_EXPRESSION) {
             $expressionToken = $this->advance();
-            $expression = trim($expressionToken->value, '()');
+
+            if (str_starts_with($expressionToken->value, '(') && str_ends_with($expressionToken->value, ')')) {
+                $expression = substr($expressionToken->value, 1, -1);
+            } else {
+                $expression = $expressionToken->value;
+            }
         }
 
         // Check if this is an ending directive
