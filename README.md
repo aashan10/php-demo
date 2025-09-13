@@ -22,3 +22,5 @@ The framework is broken down into several components. For detailed information o
 | 6 | [Middleware](./docs/06-middleware.md)           | How to filter HTTP requests entering your application.                      |
 | 7 | [Database & Models](./docs/07-database-models.md) | How to interact with the database using models.                             |
 | 8 | [Console Commands](./docs/08-console-commands.md) | How to create and run command-line tasks.                                   |
+| 9 | [Authentication](./docs/09-authentication.md) | How the authentication system works. |
+| 10 | [Cookies & Sessions](./docs/10-cookies-sessions.md) | How cookies and sessions are managed. |

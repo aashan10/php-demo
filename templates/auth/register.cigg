@@ -7,11 +7,13 @@
 @section('content')
     <h1>Register</h1>
 
-    @if (isset($errors))
+    @if (isset($errors) && !$errors->isEmpty())
         <div style="color: red;">
             <ul>
-                @foreach ($errors as $field => $error)
-                    <li>{{ $error }}</li>
+                @foreach ($errors->all() as $fieldErrors)
+                    @foreach ($fieldErrors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
                 @endforeach
             </ul>
         </div>
