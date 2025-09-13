@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use Elementary\Http\Response;
+use Elementary\Http\Controller;
 
-class PagesController extends AbstractController
+class PagesController extends Controller
 {
     public function home(): Response
     {

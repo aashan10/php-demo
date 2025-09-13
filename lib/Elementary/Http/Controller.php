@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controllers;
+namespace Elementary\Http;
 
 use Elementary\Http\Request;
 use Elementary\Http\Response;
@@ -10,8 +10,9 @@ use Elementary\Routing\RouteCollection;
 use Elementary\Routing\Router;
 use Elementary\Utils\FlashBag;
 use Elementary\Template\Cigg\Engine as TemplateEngine;
+use Elementary\Utils\ParameterBag;
 
-abstract class AbstractController
+abstract class Controller
 {
 
     public function __construct(
@@ -28,6 +29,8 @@ abstract class AbstractController
             'check' => isset($this->request->user),
             'user' => $this->request->user ?? null,
         ];
+
+        $args['errors'] = $args['errors'] ?? new ParameterBag([]);
         $response = $this->engine->render($templateName, $args);
 
         return new Response(200, $response);

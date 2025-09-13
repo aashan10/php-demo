@@ -44,7 +44,13 @@ final class AuthenticateCookieMiddleware implements MiddlewareInterface
         /** @var \App\Models\User|null $user */
         $user = $userModelClass::find((int) $userId);
 
-        if (!$user || !$user->remember_token || !hash_equals($user->remember_token, $token)) {
+        if (!$user || !$user->remember_token) {
+            return $next($request);
+        }
+
+        // Hash the token from the cookie and compare it to the stored hash
+        $hashedToken = hash('sha256', $token);
+        if (!hash_equals($user->remember_token, $hashedToken)) {
             return $next($request);
         }
 

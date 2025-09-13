@@ -8,71 +8,24 @@ use App\Models\User;
 use Elementary\Http\Request;
 use Elementary\Http\Response;
 use Elementary\Utils\FlashBag;
-use Elementary\Utils\SessionBag;
 use Elementary\Validation\Validator;
+use Elementary\Http\Controller;
+use Psr\Log\LoggerInterface;
 
-class UserController extends AbstractController
+class UserController extends Controller
 {
     public function index(): Response
     {
 
-        /* $users = [ */
-        /*     [ */
-        /*         'first_name' => 'John', */
-        /*         'last_name' => 'Doe', */
-        /*         'email' => 'test@example.com', */
-        /*         'is_active' => 1, */
-        /*         'profile_picture' => 'john.jpg', */
-        /*         'password' => password_hash('securepassword', PASSWORD_BCRYPT), */
-        /*     ], */
-        /*     [ */
-        /*         'first_name' => 'Jane', */
-        /*         'last_name' => 'Smith', */
-        /*         'email' => 'test2@example.com', */
-        /*         'is_active' => 0, */
-        /*         'profile_picture' => 'jane.jpg', */
-        /*         'password' => password_hash('anotherpassword', PASSWORD_BCRYPT), */
-        /*     ], */
-        /*     [ */
-        /*         'first_name' => 'Bob', */
-        /*         'last_name' => 'Brown', */
-        /*         'email' => 'test3@example.com', */
-        /*         'is_active' => 1, */
-        /*         'profile_picture' => 'bob.jpg', */
-        /*         'password' => password_hash('yetanotherpassword', PASSWORD_BCRYPT), */
-        /*     ], */
-        /**/
-        /* ]; */
-
-        /* foreach ($users as $user) { */
-        /*     // User::create($user); */
-        /* } */
-
-        $users = [
-            [
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'posts' => [
-                    ['title' => 'Hello World', 'date' => '2024-01-01'],
-                    ['title' => 'PHP Tips', 'date' => '2024-01-02']
-                ]
-            ],
-            [
-                'name' => 'Jane Smith',
-                'email' => 'jane@example.com',
-                'posts' => [
-                    ['title' => 'Template Engines', 'date' => '2024-01-03']
-                ]
-            ]
-
-        ];
+        $users = User::all();
 
         // This render method now comes from the updated AbstractController
         return $this->render('users/index', ['users' => $users]);
     }
 
-    public function create(): Response
+    public function create(LoggerInterface $logger): Response
     {
+        $logger->info('create page accessed!');
         return $this->render('users/create');
     }
 
@@ -112,6 +65,7 @@ class UserController extends AbstractController
             'is_active' => 1,
             'profile_picture' => 'default.jpg',
         ]);
+        
         $flashBag->add('success', 'User created successfully!');
 
         return $this->redirectToRoute('users.index');

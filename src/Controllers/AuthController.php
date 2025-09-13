@@ -9,8 +9,9 @@ use Elementary\Http\Request;
 use Elementary\Http\Response;
 use Elementary\Validation\Validator;
 use Elementary\Utils\SessionBag;
+use Elementary\Http\Controller;
 
-class AuthController extends AbstractController
+class AuthController extends Controller
 {
     public function showLoginForm(): Response
     {
@@ -45,14 +46,22 @@ class AuthController extends AbstractController
 
         $session->set('user_id', $user->id);
 
-        $response = $this->redirectToRoute('home');
+        $redirection = $session->get('redirection_url_after_login', null);
+
+        if ($redirection) {
+            $session->remove('redirection_url_after_login');
+            $response =  $this->redirect($redirection);
+        } else {
+            $response = $this->redirectToRoute('home');
+        }
 
         if (!empty($data['remember'])) {
             $token = bin2hex(random_bytes(32));
-            $user->remember_token = hash('sha256', $token);
-            $user->update(['remember_token' => $user->remember_token]);
+            $hashedToken = hash('sha256', $token);
+            $user->update(['remember_token' => $hashedToken]);
 
-            $cookieValue = "{$user->id}|{$user->remember_token}";
+            // The cookie should contain the raw token, not the hash
+            $cookieValue = "{$user->id}|{$token}";
             $response->cookies->set('elementary_auth', $cookieValue, time() + 60 * 60 * 24 * 30);
         }
 

@@ -25,6 +25,7 @@ final class AuthenticateSessionMiddleware implements MiddlewareInterface
         $session = $request->session;
 
         if (!$session->has('user_id')) {
+            $session->set('redirection_url_after_login', (string)$request->uri());
             return new Response(302, '', ['Location' => '/login']);
         }
 
@@ -33,6 +34,7 @@ final class AuthenticateSessionMiddleware implements MiddlewareInterface
 
         if (!$user instanceof UserInterface) {
             $session->remove('user_id');
+            $session->set('redirection_url_after_login', (string)$request->uri());
             return new Response(302, '', ['Location' => '/login']);
         }
 
