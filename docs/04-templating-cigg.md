@@ -64,6 +64,22 @@ While it's best to keep logic in controllers, you can execute raw PHP code in yo
 <p>{{ $message }}</p>
 ```
 
+### CSRF Field
+
+The `@csrf` directive generates a hidden HTML input field containing a CSRF (Cross-Site Request Forgery) token. This token is used to protect your application from malicious attacks.
+
+The token is automatically generated and managed by the framework's `Elementary\Utils\Csrf` service. It is stored in the user's session and is configured to expire after a specific duration (defaulting to 10 minutes, configurable in `config/session.php` under `csrf_lifetime`).
+
+You should include this directive within all your HTML forms that accept `POST`, `PUT`, `PATCH`, or `DELETE` requests.
+
+```html
+<form method="POST" action="/profile">
+    @csrf
+    <!-- Other form fields -->
+    <button type="submit">Update Profile</button>
+</form>
+```
+
 ## Template Inheritance & Includes
 
 Cigg makes it easy to build complex layouts and include partial templates.

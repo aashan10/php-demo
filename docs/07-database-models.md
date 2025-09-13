@@ -8,7 +8,7 @@ Database connection settings are stored in the `config/database.php` file. These
 
 ## Models
 
-Models are classes that represent a single table in your database. They should extend the `Elementary\Database\AbstractModel` class, which provides the core ORM functionality.
+Models are classes that represent a single table in your database. They should extend the `Elementary\Database\Model` class, which provides the core ORM functionality.
 
 The only requirement for a model class is to define the static `$tableName` property.
 
@@ -17,7 +17,7 @@ The only requirement for a model class is to define the static `$tableName` prop
 
 namespace App\Models;
 
-class User extends AbstractModel
+class User extends Model
 {
     protected static string $tableName = 'users';
 
@@ -29,6 +29,20 @@ class User extends AbstractModel
     public string $password;
 }
 ```
+
+### User Model Configuration
+
+For authentication and other framework features that interact with your application's user model, the specific class is configured in `config/auth.php`:
+
+```php
+// config/auth.php
+
+return [
+    'model' => App\Models\User::class,
+];
+```
+
+This allows the framework to remain decoupled from your application's specific user model implementation.
 
 ## Querying the Database
 
@@ -92,7 +106,7 @@ For queries that you run often, you can add custom methods to your model class t
 ```php
 // In the User model
 
-class User extends AbstractModel
+class User extends Model
 {
     // ...
 

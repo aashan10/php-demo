@@ -4,7 +4,7 @@ Controllers are responsible for handling incoming requests, processing data, and
 
 ## Creating a Controller
 
-A controller is a simple PHP class that typically extends the `App\Controllers\AbstractController`. Extending the abstract controller provides access to helper methods, such as `render()` for rendering templates.
+A controller is a simple PHP class that typically extends the `Elementary\Http\Controller`. Extending the base controller provides access to helper methods, such as `render()` for rendering templates.
 
 Here is an example of a basic controller:
 
@@ -15,8 +15,9 @@ namespace App\Controllers;
 
 use Elementary\Http\Request;
 use Elementary\Http\Response;
+use Elementary\Http\Controller;
 
-class UserController extends AbstractController
+class UserController extends Controller
 {
     public function index(): Response
     {

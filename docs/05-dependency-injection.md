@@ -27,17 +27,17 @@ A common use case is to bind an interface to a concrete class. This allows you t
 ```php
 // bootstrap.php
 
-// Tell the container that whenever a class needs a UserRepositoryInterface,
-// it should provide an instance of UserRepository.
-$container->bind(UserRepositoryInterface::class, UserRepository::class);
+// Example: Tell the container that whenever a class needs a MailerInterface,
+// it should provide an instance of SmtpMailer.
+$container->bind(MailerInterface::class, SmtpMailer::class);
 ```
 
 Now you can type-hint the interface in your controller, and the container will provide the correct object:
 
 ```php
-public function __construct(UserRepositoryInterface $users)
+public function __construct(MailerInterface $mailer)
 {
-    $this->users = $users;
+    $this->mailer = $mailer;
 }
 ```
 

@@ -4,7 +4,7 @@ The Elementary framework includes a command-line interface that allows you to ru
 
 ## Creating a Command
 
-To create a new command, create a new PHP class in the `src/Console/Commands` directory. It's recommended that your command extends `Elementary\Console\AbstractCommand` to gain access to helpful output methods.
+To create a new command, create a new PHP class in the `src/Console/Commands` directory. It's recommended that your command extends `Elementary\Console\Command` to gain access to helpful output methods.
 
 The class should have two main components:
 
@@ -16,9 +16,9 @@ The class should have two main components:
 
 namespace App\Console\Commands;
 
-use Elementary\Console\AbstractCommand; // Don't forget to import!
+use Elementary\Console\Command; // Don't forget to import!
 
-class HelloWorldCommand extends AbstractCommand
+class HelloWorldCommand extends Command
 {
     public static string $defaultName = 'app:hello-world';
 
@@ -69,7 +69,7 @@ Beyond your custom commands, the framework provides some built-in utilities:
 
 ## Command Output Helpers
 
-When your command extends `Elementary\Console\AbstractCommand`, you gain access to several convenient methods for printing formatted output to the console:
+When your command extends `Elementary\Console\Command`, you gain access to several convenient methods for printing formatted output to the console:
 
 *   **`$this->line(string $text)`**: Prints a plain line of text.
 *   **`$this->info(string $text)`**: Prints an informational message in blue, prefixed with `[INFO]:`.
