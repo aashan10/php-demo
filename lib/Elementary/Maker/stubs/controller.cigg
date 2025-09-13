@@ -1,0 +1,12 @@
+{!! "<?php\n" !!}
+
+{{ "declare(strict_types=1);\n" }}
+
+{{ "namespace App\Controllers;\n" }}
+
+{{ "use Elementary\Http\Controller;\n" }}
+
+class {{ $class }} extends Controller 
+{
+    //
+}

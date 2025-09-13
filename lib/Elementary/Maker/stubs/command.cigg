@@ -1,0 +1,21 @@
+{!! '<?php' !!}
+
+declare(strict_types=1);
+
+namespace App\Console\Commands;
+
+use Elementary\Console\Command;
+
+
+class {{ $class }} extends Command 
+{
+    protected $signature = '{{ $signature }}';
+    protected $description = '{{ $description }}';
+
+    public function execute(array $args = []): int
+    {
+        // Command logic goes here
+
+        return 0;
+    }
+}

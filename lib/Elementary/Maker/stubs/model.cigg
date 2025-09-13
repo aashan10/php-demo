@@ -1,0 +1,15 @@
+{!! "<?php\n" !!}
+
+{{ "declare(strict_types=1);\n" }}
+
+{{ "namespace App\Models;\n" }}
+
+{{ "use Elementary\Database\Model;\n" }}
+
+class {{ $class }} extends Model 
+{
+    protected static string $table = '{{ $table }}';
+
+    //
+}
+
