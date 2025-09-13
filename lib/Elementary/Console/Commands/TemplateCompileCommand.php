@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Elementary\Console\Commands;
 
-use Elementary\Console\AbstractCommand;
+use Elementary\Console\Command;
 use Elementary\Template\Cigg\Engine;
 use Elementary\Utils\Traits\BetterTry;
 
-class TemplateCompileCommand extends AbstractCommand
+class TemplateCompileCommand extends Command
 {
 
     use BetterTry;

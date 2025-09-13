@@ -6,7 +6,7 @@ namespace Elementary\Console;
 
 use Elementary\Console\Components\Table;
 
-abstract class AbstractCommand
+abstract class Command
 {
     // ANSI Color Codes
     protected const COLOR_DEFAULT = "\033[0m";
@@ -17,6 +17,9 @@ abstract class AbstractCommand
     protected const COLOR_BOLD = "\033[1m";
     protected const COLOR_RESET_BOLD = "\033[22m";
     protected const COLOR_RESET_ALL = "\033[0m";
+
+    public const SUCCESS = 0;
+    public const FAILURE = 1;
 
     /**
      * Writes a string to the console.

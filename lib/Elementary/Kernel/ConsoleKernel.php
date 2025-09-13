@@ -9,14 +9,16 @@ use Elementary\Console\Commands\SessionCleanCommand;
 use Elementary\Console\Commands\TemplateCompileCommand;
 use Elementary\Database\Connection;
 use Elementary\DI\Container;
-use Elementary\Http\Request;
 use Elementary\Http\Response;
-use Elementary\Http\Router;
-// Removed App\Models\AbstractModel, App\Repositories\UserRepository, App\Repositories\UserRepositoryInterface
+use Elementary\Maker\Commands\MakeCommandCommand;
+use Elementary\Maker\Commands\MakeControllerCommand;
+use Elementary\Maker\Commands\MakeMiddlewareCommand;
+use Elementary\Maker\Commands\MakeModelCommand;
 use Elementary\Utils\FlashBag;
 use Elementary\Utils\SessionBag;
 use Elementary\Utils\Traits\BetterTry;
 use ReflectionClass;
+use ReflectionException;
 use Whoops\Run;
 use Whoops\Handler\PlainTextHandler;
 
@@ -31,6 +33,10 @@ class ConsoleKernel implements KernelInterface
         $this->cliCommands = [
             $this->getCommandName(TemplateCompileCommand::class) => TemplateCompileCommand::class,
             $this->getCommandName(SessionCleanCommand::class)    => SessionCleanCommand::class,
+            $this->getCommandName(MakeControllerCommand::class)  => MakeControllerCommand::class,
+            $this->getCommandName(MakeModelCommand::class)       => MakeModelCommand::class,
+            $this->getCommandName(MakeMiddlewareCommand::class)  => MakeMiddlewareCommand::class,
+            $this->getCommandName(MakeCommandCommand::class)     => MakeCommandCommand::class,
         ];
         // Constructor is empty, bootstrap will set up the container
     }
@@ -124,14 +130,64 @@ class ConsoleKernel implements KernelInterface
         echo "{$description}\n";
     }
 
+    private function getTerminalWidth(): int
+    {
+        if (function_exists('exec')) {
+            exec('stty size', $output);
+            if (isset($output[0])) {
+                $size = explode(' ', $output[0]);
+                if (isset($size[1]) && is_numeric($size[1])) {
+                    return (int) $size[1];
+                }
+            }
+        }
+
+        // Fallback
+        return 80;
+    }
+
     private function displayAppHelp(): void 
     {
         echo "Usage: elementary <command>\n\n";
         echo "Available commands:\n";
-        ksort($this->cliCommands); // Sort commands alphabetically
-        foreach ($this->cliCommands as $name => $fqcn) {
-            echo "  - {$name}\n";
+        ksort($this->cliCommands);
+
+        // Get terminal width using the robust helper method
+        $terminalWidth = $this->getTerminalWidth();
+
+        $maxLength = 0;
+        foreach (array_keys($this->cliCommands) as $name) {
+            $maxLength = max($maxLength, strlen($name));
         }
+
+        $colorBlue = "\033[0;34m";
+        $colorBold = "\033[1m";
+        $colorReset = "\033[0m";
+
+        $prefixLength = 2; // "  "
+        $spacing = 2;      // "  " between command and description
+        $availableDescriptionWidth = $terminalWidth - $maxLength - $prefixLength - $spacing;
+
+        foreach ($this->cliCommands as $name => $fqcn) {
+            $paddedName = str_pad($name, $maxLength);
+            $description = '';
+            try {
+                $reflectionClass = new ReflectionClass($fqcn);
+                if ($reflectionClass->hasProperty('description') && $reflectionClass->getProperty('description')->isStatic()) {
+                    $description = $reflectionClass->getStaticPropertyValue('description');
+                }
+            } catch (ReflectionException $e) {
+                // Ignore
+            }
+
+            if ($availableDescriptionWidth > 3 && strlen($description) > $availableDescriptionWidth) {
+                $description = substr($description, 0, $availableDescriptionWidth - 3) . '...';
+            }
+
+            echo "  " . $colorBold . $colorBlue . $paddedName . $colorReset . "  " . $description . "\n";
+        }
+
+        echo "\nFor more information on a command, pass the -h or --help flag, e.g., \"elementary cache:clear --help\".\n";
     }
 
     public function handle(): Response

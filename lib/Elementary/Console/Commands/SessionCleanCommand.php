@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Elementary\Console\Commands;
 
-use Elementary\Console\AbstractCommand;
+use Elementary\Console\Command;
 use Elementary\Utils\Traits\BetterTry;
 
-class SessionCleanCommand extends AbstractCommand
+class SessionCleanCommand extends Command
 {
 
     use BetterTry;
