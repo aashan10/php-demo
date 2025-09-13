@@ -6,6 +6,7 @@ use Elementary\DI\Container;
 use Elementary\Database\Model;
 use App\Repositories\UserRepository;
 use App\Repositories\UserRepositoryInterface;
+use Elementary\Log\Drivers\FileLogger;
 use Elementary\Template\Cigg\Engine as ElementaryEngine;
 use Elementary\Template\Cigg\LayoutManager;
 use Elementary\Utils\FlashBag;
@@ -18,6 +19,7 @@ use Elementary\Validation\Validator;
 use Elementary\Database\QueryBuilder;
 use Elementary\Utils\EncryptionService;
 use Elementary\Session\SessionManager;
+use Psr\Log\LoggerInterface;
 
 Validator::macro('validateName', function ($data) {
     /** @var Validator $this */
@@ -57,6 +59,16 @@ $container->bind(EncryptionService::class, fn(Container $c) => new EncryptionSer
 // Bind SessionManager
 $container->bind(SessionManager::class, fn(Container $c) => new SessionManager($c->get(ConfigBag::class), $c->get(Connection::class)));
 
+
+$container->bind(LoggerInterface::class, function (Container $c): LoggerInterface {
+    $config = $c->get(ConfigBag::class);
+    $driver = $config->get('logging.driver', 'file');
+
+    return match($driver) {
+        'file' => $c->get(FileLogger::class),
+        default => throw new \Exception('Unknown logger driver')
+    };
+});
 
 
 // Bind LayoutManager
