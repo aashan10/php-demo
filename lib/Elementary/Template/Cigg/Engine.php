@@ -115,7 +115,7 @@ class Engine
         $this->globals[$key] = $value;
     }
 
-    private function renderCompiledTemplate(string $cachePath, array $data): string
+    public function renderCompiledTemplate(string $cachePath, array $data): string
     {
         $data['__engine'] = $this;
         $data['__layoutManager'] = $this->layoutManager;
