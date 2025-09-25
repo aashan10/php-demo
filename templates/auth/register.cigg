@@ -1,48 +1,138 @@
 @extends('layouts/guest')
 
 @section('title')
-    Register
+    Create Account - Elementary Framework
 @endsection
 
 @section('content')
-    <h1>Register</h1>
+<div class="min-h-[calc(100vh-theme(spacing.16))] flex items-center justify-center py-12">
+    <div class="max-w-md w-full mx-auto">
+        <!-- Card -->
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-green-600 to-blue-600 px-8 py-8 text-center">
+                <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold text-white mb-2">Join Elementary</h1>
+                <p class="text-green-100">Create your account and get started</p>
+            </div>
 
-    @if (isset($errors) && !$errors->isEmpty())
-        <div style="color: red;">
-            <ul>
-                @foreach ($errors->all() as $fieldErrors)
-                    @foreach ($fieldErrors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                @endforeach
-            </ul>
-        </div>
-    @endif
+            <!-- Form -->
+            <div class="px-8 py-8">
+                <!-- Error Messages -->
+                @if (isset($errors) && !$errors->isEmpty())
+                    <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div class="flex items-center mb-2">
+                            <svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            </svg>
+                            <h3 class="text-sm font-medium text-red-800">Please fix the following errors:</h3>
+                        </div>
+                        <ul class="text-sm text-red-700 space-y-1">
+                            @foreach ($errors->all() as $fieldErrors)
+                                @foreach ($fieldErrors->all() as $error)
+                                    <li class="flex items-center">
+                                        <span class="w-1 h-1 bg-red-400 rounded-full mr-2"></span>
+                                        {{ $error }}
+                                    </li>
+                                @endforeach
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
-    <form action="/register" method="post">
-        <div>
-            <label for="first_name">First Name</label>
-            <input type="text" id="first_name" name="first_name" value="{{ $old['first_name'] ?? '' }}" required>
+                <form action="/register" method="post" class="space-y-5">
+                    @csrf
+                    
+                    <!-- Name Fields -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <ui-forms.input 
+                            type="text"
+                            name="first_name"
+                            label="First Name"
+                            placeholder="John"
+                            :value="$old['first_name'] ?? ''"
+                            focus-color="green"
+                            required="true" />
+                        <ui-forms.input 
+                            type="text"
+                            name="last_name"
+                            label="Last Name"
+                            placeholder="Doe"
+                            :value="$old['last_name'] ?? ''"
+                            focus-color="green"
+                            required="true" />
+                    </div>
+
+                    <!-- Email -->
+                    <ui-forms.input 
+                        type="email"
+                        name="email"
+                        label="Email Address"
+                        placeholder="john@example.com"
+                        :value="$old['email'] ?? ''"
+                        focus-color="green"
+                        required="true"
+                        />
+
+                    <ui-forms.input 
+                        type="password"
+                        name="password"
+                        label="Password"
+                        placeholder="Create a secure password"
+                        focus-color="green"
+                        help-text="Must be at least 8 characters long"
+                        required="true"
+                        />
+
+                    <ui-forms.input 
+                        type="password"
+                        name="password_confirmation"
+                        label="Confirm Password"
+                        placeholder="Confirm your password"
+                        focus-color="green"
+                        required="true"
+                        />
+
+                    <ui-forms.checkbox 
+                        name="terms" 
+                        focus-color="green"
+                        required="true">
+                        I agree to the 
+                        <a href="#" class="text-green-600 hover:text-green-700 font-medium">Terms of Service</a> 
+                        and 
+                        <a href="#" class="text-green-600 hover:text-green-700 font-medium">Privacy Policy</a>
+                    </ui-forms.checkbox>
+
+                    <ui-forms.button type="submit" variant="success" full-width="true">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                        </svg>
+                        Create Account
+                    </ui-forms.button>
+                </form>
+
+                <!-- Sign In Link -->
+                <div class="mt-8 text-center">
+                    <p class="text-gray-600">
+                        Already have an account? 
+                        <a href="/login" class="text-green-600 hover:text-green-700 font-semibold hover:underline">
+                            Sign in here
+                        </a>
+                    </p>
+                </div>
+            </div>
         </div>
-        <div>
-            <label for="last_name">Last Name</label>
-            <input type="text" id="last_name" name="last_name" value="{{ $old['last_name'] ?? '' }}" required>
+
+        <!-- Additional Info -->
+        <div class="mt-8 text-center">
+            <p class="text-sm text-gray-500">
+                By creating an account, you're joining a community built on modern PHP
+            </p>
         </div>
-        <div>
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" value="{{ $old['email'] ?? '' }}" required>
-        </div>
-        <div>
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <div>
-            <label for="password_confirmation">Confirm Password</label>
-            <input type="password" id="password_confirmation" name="password_confirmation" required>
-        </div>
-        <div>
-            <button type="submit">Register</button>
-        </div>
-    </form>
-    <p>Already have an account? <a href="/login">Login here</a>.</p>
+    </div>
+</div>
 @endsection

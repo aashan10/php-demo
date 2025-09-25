@@ -55,7 +55,7 @@ class QueryBuilder
         return $this;
     }
 
-    public function limit(int $number): self
+    public function limit(?int $number): self
     {
         $this->limit = $number;
         return $this;
@@ -141,7 +141,7 @@ class QueryBuilder
         return $stmt->rowCount();
     }
 
-    private function toSql(): string
+    public function toSql(): string
     {
         $sql = "SELECT " . implode(', ', $this->columns) . " FROM `{$this->table}`";
 

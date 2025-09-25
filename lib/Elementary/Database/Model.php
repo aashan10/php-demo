@@ -22,7 +22,8 @@ abstract class Model
     public static function query(): QueryBuilder
     {
         /** @var QueryBuilder $builder */
-        $builder = self::getContainer()->get(QueryBuilder::class);
+        $builder = self::getContainer()->make(QueryBuilder::class);
+
 
         return $builder->table(static::$table)
                        ->setModel(static::class)

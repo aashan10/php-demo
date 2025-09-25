@@ -1,0 +1,6 @@
+<div class="card">
+    <h2 class="card-title">{{ $title ?? 'Default Title' }}</h2>
+    <div class="card-body">
+        {{ $slot ?? 'No content provided' }}
+    </div>
+</div>

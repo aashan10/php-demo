@@ -16,5 +16,6 @@ class TokenType {
     const T_RPAREN = 'RPAREN';                  // )
     const T_EXPRESSION = 'EXPRESSION';          // PHP expression
     const T_WHITESPACE = 'WHITESPACE';
+    const T_COMPONENT_TAG = 'COMPONENT_TAG';
     const T_EOF = 'EOF';
 }

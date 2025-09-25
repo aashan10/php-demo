@@ -9,7 +9,12 @@ class Router
 {
     private static array $groupStack = [];
 
-    private static function newRoute(array|string $methods, string $uri, mixed $action): Route
+    public static function any(string $uri, mixed $action): Route
+    {
+        return static::newRoute(['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], $uri, $action);
+    }
+
+    public static function newRoute(array|string $methods, string $uri, mixed $action): Route
     {
         $route = new Route($methods, $uri, $action);
         

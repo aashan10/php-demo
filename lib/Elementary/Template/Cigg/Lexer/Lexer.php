@@ -49,6 +49,17 @@ private string $input;
 
             // Only process template syntax if we're not in a special context
             if (!$this->inSpecialContext()) {
+                if ($char === '<' && (str_starts_with($this->peek(4), '<ui-') || str_starts_with($this->peek(5), '</ui-'))) {
+                    if ($textBuffer) {
+                        $tokens[] = new Token(TokenType::T_TEXT, $textBuffer, $this->line, $this->column - strlen($textBuffer));
+                        $textBuffer = '';
+                    }
+
+                    $tagContent = $this->scanTag();
+                    $tokens[] = new Token(TokenType::T_COMPONENT_TAG, $tagContent, $this->line, $this->column - strlen($tagContent));
+                    continue;
+                }
+                
                 if ($char === '{') {
                     // Flush any accumulated text
                     if ($textBuffer) {
@@ -64,8 +75,7 @@ private string $input;
                         $textBuffer .= $char;
                         $this->advance();
                     }
-                } elseif ($char === '@') {
-                    // Flush any accumulated text
+                } elseif ($char === '@') {                    // Flush any accumulated text
                     if ($textBuffer) {
                         $tokens[] = new Token(TokenType::T_TEXT, $textBuffer, $this->line, $this->column - strlen($textBuffer));
                         $textBuffer = '';
@@ -299,6 +309,21 @@ private string $input;
         }
 
         return $expression;
+    }
+
+    private function scanTag(): string
+    {
+        $tag = '';
+        while (!$this->isAtEnd() && $this->current() !== '>') {
+            $tag .= $this->current();
+            $this->advance();
+        }
+        // Include the closing '>'
+        if ($this->current() === '>') {
+            $tag .= $this->current();
+            $this->advance();
+        }
+        return $tag;
     }
 
     private function scanUntil(string $delimiter): string

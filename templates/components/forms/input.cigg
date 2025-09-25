@@ -1,0 +1,63 @@
+@php
+    $type = $type ?? 'text';
+    $name = $name ?? '';
+    $id = $id ?? $name;
+    $label = $label ?? '';
+    $placeholder = $placeholder ?? '';
+    $value = $value ?? ($old[$name] ?? '');
+    $required = isset($required) ? 'required' : '';
+    $icon = $icon ?? null;
+    $helpText = $helpText ?? null;
+    $focusColor = $focusColor ?? 'blue'; // blue, green, red, etc.
+    
+    $focusClasses = match($focusColor) {
+        'green' => 'focus:ring-green-500 focus:border-transparent',
+        'red' => 'focus:ring-red-500 focus:border-transparent',
+        'blue' => 'focus:ring-blue-500 focus:border-transparent',
+        default => 'focus:ring-blue-500 focus:border-transparent'
+    };
+    
+    $baseClasses = "w-full py-3 border border-gray-300 rounded-lg transition-colors duration-200 bg-gray-50 focus:bg-white {$focusClasses}";
+    $inputClasses = $icon ? "pl-10 pr-4 {$baseClasses}" : "px-4 {$baseClasses}";
+@endphp
+
+<div>
+    @if($label)
+        <label for="{{ $id }}" class="block text-sm font-semibold text-gray-900 mb-2">
+            {{ $label }}
+        </label>
+    @endif
+    
+    @if($icon)
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                {!! $icon !!}
+            </div>
+            <input 
+                type="{{ $type }}" 
+                id="{{ $id }}" 
+                name="{{ $name }}" 
+                value="{{ $value }}" 
+                {{ $required }}
+                class="{{ $inputClasses }}"
+                @if($placeholder) placeholder="{{ $placeholder }}" @endif
+            >
+        </div>
+    @else
+        <input 
+            type="{{ $type }}" 
+            id="{{ $id }}" 
+            name="{{ $name }}" 
+            value="{{ $value }}" 
+            {{ $required }}
+            class="{{ $inputClasses }}"
+            @if($placeholder) placeholder="{{ $placeholder }}" @endif
+        >
+    @endif
+    
+    @if($helpText)
+        <p class="mt-1 text-xs text-gray-500">
+            {{ $helpText }}
+        </p>
+    @endif
+</div>

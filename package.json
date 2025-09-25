@@ -1,0 +1,34 @@
+{
+  "name": "php",
+  "version": "1.0.0",
+  "description": "This is a custom PHP application built with the Elementary framework, a lightweight, modern framework designed for simplicity and performance. It features a dependency injection container, a flexible router, a custom templating engine (Cigg), and a powerful command-line interface.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2",
+    "vite": "^6.3.6"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aashan10/php-demo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/aashan10/php-demo/issues"
+  },
+  "homepage": "https://github.com/aashan10/php-demo#readme",
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.13",
+    "tailwindcss": "^4.1.13"
+  }
+}

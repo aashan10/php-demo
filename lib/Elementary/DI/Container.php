@@ -30,6 +30,11 @@ class Container
         return isset($this->bindings[$id]) || isset($this->instances[$id]);
     }
 
+    public function make(string $id) 
+    {
+        return $this->resolve($id);
+    }
+
     public function bind(string $abstract, callable|string|null $concrete = null): void
     {
         if ($concrete === null) {

@@ -86,6 +86,7 @@ $container->bind(ElementaryEngine::class, function (Container $c): ElementaryEng
     );
 
     $engine->addGlobal('app_name', $c->get(ConfigBag::class)->get('app.name', 'MyApp'));
+    $engine->addGlobal('__container', $c); // Expose container to templates
 
     /** @var DirectiveRegistry $registry */
     $registry = $c->get(DirectiveRegistry::class); // Ensure directives are registered
@@ -106,6 +107,7 @@ $container->bind(DirectiveRegistry::class, function(Container $c) {
         $directiveInstance = $c->get($directiveClass);
         $registry->register($directiveInstance);
     }
+
 
     return $registry;
 });

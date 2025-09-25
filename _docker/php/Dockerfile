@@ -8,8 +8,21 @@ FROM php:8.2-fpm-alpine
 # pcntl for the One Billion Rows Challenge command
 RUN docker-php-ext-install pdo_mysql mysqli opcache pcntl
 
+RUN apk add --no-cache linux-headers \
+    && apk add --update --no-cache --virtual .build-dependencies $PHPIZE_DEPS\
+    && pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+    && pecl clear-cache \
+    && apk del .build-dependencies
+
+
+# Install Node.js v22+ and npm
+RUN apk add --no-cache nodejs npm
+
 # Set working directory
 WORKDIR /var/www/html
+
+RUN apk add curl
 
 # Copy application code (will be mounted as a volume in docker-compose, but good for image build)
 # COPY . /var/www/html # This line is commented out because we will mount the code as a volume

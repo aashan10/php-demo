@@ -9,7 +9,8 @@
         "psr/log": "^3.0"
     },
     "require-dev": {
-        "filp/whoops": "^2.15"
+        "filp/whoops": "^2.15",
+        "phpunit/phpunit": "^11.0"
     },
     "autoload": {
         "psr-4": {
@@ -19,6 +20,17 @@
         "files": [
             "src/functions/dd.php"
         ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-html storage/coverage",
+        "test-unit": "phpunit --testsuite=\"Unit Tests\"",
+        "test-feature": "phpunit --testsuite=\"Feature Tests\""
     }
 
 }

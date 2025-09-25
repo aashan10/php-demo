@@ -48,4 +48,10 @@ class RouteCollection
     {
         return $this->namedRoutes[$name] ?? null;
     }
+
+    public function clear(): void
+    {
+        $this->routes = [];
+        $this->namedRoutes = [];
+    }
 }

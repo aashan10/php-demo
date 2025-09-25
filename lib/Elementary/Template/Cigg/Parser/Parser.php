@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Elementary\Template\Cigg\Parser;
 
+use Elementary\Template\Cigg\AST\ComponentNode;
 use Elementary\Template\Cigg\Directives\DirectiveRegistry;
 use Elementary\Template\Cigg\Token\Token;
 use Elementary\Template\Cigg\Token\TokenType;
@@ -51,6 +52,7 @@ class Parser
             TokenType::T_ECHO_START => $this->parseEcho(),
             TokenType::T_RAW_ECHO_START => $this->parseRawEcho(),
             TokenType::T_DIRECTIVE_START => $this->parseDirective(),
+            TokenType::T_COMPONENT_TAG => $this->parseComponent(),
             TokenType::T_EOF => null,
             default => $this->advance() ? $this->parseStatement() : null
         };
@@ -116,32 +118,96 @@ class Parser
         return new DirectiveNode($name->value, $expression, $children);
     }
 
+    private function parseComponent(): ?Node
+    {
+        $token = $this->peek();
+        $tagContent = $token->value;
+
+        // Is it a closing tag? If so, it should be handled by the parent block parser.
+        if (str_starts_with($tagContent, '</ui-')) {
+            $this->advance(); // Consume the closing tag to prevent infinite loop
+            return null;
+        }
+
+        // Regex to extract tag name, attributes, and self-closing flag
+        if (!preg_match('/<ui-([\w.-]+)((?:\s+(?:[\w-]+|:[\w-]+)\s*=\s*(?:\"[^\"]*\"|\'[^\']*\'))*)\s*(\/?)>/s', $tagContent, $matches)) {
+            // Invalid component tag, treat as text
+            $this->advance();
+            return new TextNode($tagContent);
+        }
+
+        $tagName = $matches[1];
+        $attributesString = $matches[2] ?? '';
+        $isSelfClosing = !empty($matches[3]);
+
+        $attributes = $this->parseAttributes($attributesString);
+        $this->advance(); // Consume the component tag token
+
+        if ($isSelfClosing) {
+            return new ComponentNode($tagName, $attributes, null);
+        }
+
+        // It's a block component, so parse the slot content
+        $children = [];
+        while (!$this->isAtEnd()) {
+            $next_token = $this->peek();
+            if ($next_token->type === TokenType::T_COMPONENT_TAG && $next_token->value === '</ui-' . $tagName . '>') {
+                $this->advance(); // Consume the closing tag
+                break;
+            }
+
+            $node = $this->parseStatement();
+            if ($node) {
+                $children[] = $node;
+            }
+        }
+
+        $slot = new DocumentNode($children);
+
+        return new ComponentNode($tagName, $attributes, $slot);
+    }
+
+    private function parseAttributes(string $attributesString): array
+    {
+        $attributes = [];
+        $pattern = '/\s+(:?)([\w-]+)\s*=\s*(?:\"([^\"]*)\"|\'([^\']*)\')/';
+        if (preg_match_all($pattern, $attributesString, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $isDynamic = !empty($match[1]); // Check if it starts with ':'
+                $attributeName = $match[2];
+                $attributeValue = $match[3] ?? $match[4]; // Get value from either double or single quotes
+                
+                $attributes[$attributeName] = [
+                    'value' => $attributeValue,
+                    'dynamic' => $isDynamic
+                ];
+            }
+        }
+        
+        return $attributes;
+    }
+
     private function parseBlockWithEnding(string $directiveName): array
     {
         $children = [];
-        $endDirective = 'end' . $directiveName;
         $endingNode = null;
+        $endingDirectiveName = 'end' . $directiveName;
 
         while (!$this->isAtEnd()) {
             $token = $this->peek();
             
-            // Check for end directive
             if ($token->type === TokenType::T_DIRECTIVE_START) {
+                // Look ahead to see if this is our ending directive
                 $nextToken = $this->peekNext();
-                if ($nextToken && $nextToken->type === TokenType::T_IDENTIFIER && $nextToken->value === $endDirective) {
-                    // Consume the end directive
-                    $this->advance(); // @
-                    $endNameToken = $this->advance(); // end directive name
-                    
-                    // Create ending node
-                    $endingNode = new DirectiveNode($endNameToken->value, '', []);
+                if ($nextToken && $nextToken->value === $endingDirectiveName) {
+                    $endingNode = $this->parseStatement();
                     break;
                 }
             }
-
-            $child = $this->parseStatement();
-            if ($child) {
-                $children[] = $child;
+            
+            $node = $this->parseStatement();
+            if ($node) {
+                $children[] = $node;
             }
         }
 

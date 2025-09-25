@@ -15,5 +15,6 @@ return [
         \Elementary\Template\Cigg\Directives\BuiltIn\ExtendsDirective::class,
         \Elementary\Template\Cigg\Directives\BuiltIn\SectionDirective::class,
         \Elementary\Template\Cigg\Directives\BuiltIn\YieldDirective::class,
+        \Elementary\Template\Cigg\Directives\BuiltIn\AssetDirective::class,
     ],
 ];

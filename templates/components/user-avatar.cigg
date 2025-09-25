@@ -1,0 +1,6 @@
+<div class="flex items-center space-x-2">
+    <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+        <span class="text-white text-sm font-medium">{{ $initial ?? 'U' }}</span>
+    </div>
+    <span class="text-sm text-gray-700">Welcome, <span class="font-medium">{{ $name ?? 'User' }}</span></span>
+</div>

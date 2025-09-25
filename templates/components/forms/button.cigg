@@ -1,0 +1,33 @@
+@php
+    $type = $type ?? 'button';
+    $variant = $variant ?? 'primary'; // primary, secondary, danger
+    $size = $size ?? 'md'; // sm, md, lg
+    $fullWidth = isset($fullWidth);
+    
+    $baseClasses = 'font-semibold rounded-lg focus:ring-4 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl inline-flex items-center justify-center';
+    
+    $sizeClasses = match($size) {
+        'sm' => 'py-2 px-3 text-sm',
+        'lg' => 'py-4 px-6 text-lg',
+        default => 'py-3 px-4 text-base'
+    };
+    
+    $variantClasses = match($variant) {
+        'primary' => 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 focus:ring-blue-200',
+        'success' => 'bg-gradient-to-r from-green-600 to-blue-600 text-white hover:from-green-700 hover:to-blue-700 focus:ring-green-200',
+        'danger' => 'bg-gradient-to-r from-red-600 to-pink-600 text-white hover:from-red-700 hover:to-pink-700 focus:ring-red-200',
+        'secondary' => 'bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-200',
+        default => 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 focus:ring-blue-200'
+    };
+    
+    $widthClass = $fullWidth ? 'w-full' : '';
+    
+    $finalClasses = trim("{$baseClasses} {$sizeClasses} {$variantClasses} {$widthClass}");
+@endphp
+
+<button 
+    type="{{ $type }}"
+    class="{{ $finalClasses }}"
+>
+    {!! $slot !!}
+</button>

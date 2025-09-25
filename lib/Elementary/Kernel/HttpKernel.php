@@ -20,6 +20,7 @@ use Whoops\Handler\PrettyPageHandler;
 class HttpKernel implements KernelInterface
 {
     private Container $container;
+    private ?Run $whoops = null;
 
     public function __construct()
     {
@@ -33,9 +34,9 @@ class HttpKernel implements KernelInterface
         $config = $this->container->get(ConfigBag::class);
 
         if (str_starts_with($config->get('app.env', 'dev'), 'dev')) {
-            $whoops = new Run();
-            $whoops->pushHandler(new PrettyPageHandler());
-            $whoops->register();
+            $this->whoops = new Run();
+            $this->whoops->pushHandler(new PrettyPageHandler());
+            $this->whoops->register();
         }
 
         $request = Request::createFromGlobals();
@@ -142,7 +143,7 @@ class HttpKernel implements KernelInterface
                 $args[] = $parameter->getDefaultValue();
             } else {
                 // Cannot resolve the parameter
-                throw new \RuntimeException("Cannot resolve parameter \${$parameter->getName()}");
+                throw new \RuntimeException("Cannot resolve parameter \"" . $parameter->getName() . "\"");
             }
         }
         return $action(...$args);
@@ -177,6 +178,11 @@ class HttpKernel implements KernelInterface
 
     public function terminate(Response $response): void
     {
+        // Clean up Whoops error handler if it was registered
+        if ($this->whoops !== null) {
+            $this->whoops->unregister();
+            $this->whoops = null;
+        }
     }
 
     public function terminateCli(int $statusCode): void
@@ -184,4 +190,3 @@ class HttpKernel implements KernelInterface
         throw new \BadMethodCallException("terminateCli not implemented for HttpKernel");
     }
 }
-

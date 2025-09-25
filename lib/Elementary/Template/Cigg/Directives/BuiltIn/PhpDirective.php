@@ -26,12 +26,15 @@ class PhpDirective extends AbstractDirective
     public function compile(DirectiveNode $node): string
     {
 
-        $code = $node->children[0] ?? null;
-
-        if ($code instanceof TextNode) {
-            return "<?php {$code->content} ?>";
+        $start = "<?php\n";
+        foreach ($node->children as $child) {
+            if ($child instanceof TextNode) {
+                $start .= $child->content . "\n";
+            }
         }
-        return '';
+        $start .= "?>";
+
+        return $start;
 
     }
 }

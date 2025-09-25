@@ -44,7 +44,7 @@ class StartSession implements MiddlewareInterface
             }
         }
 
-        session_start(['use_cookies' => false]);
+        session_start();
 
         $response = $next($request);
 

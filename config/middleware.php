@@ -1,5 +1,6 @@
 <?php
 
+use Elementary\Authentication\Middleware\GuestMiddleware;
 use Elementary\Http\Middleware\StartSession;
 use Elementary\Http\Middleware\TrimStrings;
 use Elementary\Http\Middleware\EncryptCookies;
@@ -46,6 +47,9 @@ return [
             AuthenticateSessionMiddleware::class,
             AuthenticateCookieMiddleware::class,
             AuthenticateApiMiddleware::class,
+        ],
+        'guest' => [
+            GuestMiddleware::class,
         ]
     ]
 ];

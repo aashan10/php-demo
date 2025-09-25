@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         colors="true"
+         stopOnFailure="false"
+         processIsolation="false"
+         backupGlobals="false"
+         backupStaticProperties="false"
+         cacheDirectory="cache/phpunit">
+    <testsuites>
+        <testsuite name="Unit Tests">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature Tests">
+            <directory>tests/Feature</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>lib/Elementary</directory>
+            <directory>src</directory>
+        </include>
+        <exclude>
+            <directory>lib/Elementary/*/stubs</directory>
+            <file>src/functions/dd.php</file>
+        </exclude>
+    </source>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+    </php>
+    <logging>
+        <testdoxHtml outputFile="storage/coverage/testdox.html"/>
+        <junit outputFile="storage/coverage/junit.xml"/>
+    </logging>
+</phpunit>

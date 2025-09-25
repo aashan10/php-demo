@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Elementary\Template\Cigg\Compiler;
 
+use Elementary\Template\Cigg\AST\ComponentNode;
 use Elementary\Template\Cigg\AST\DirectiveNode;
 use Elementary\Template\Cigg\AST\DocumentNode;
 use Elementary\Template\Cigg\AST\EchoNode;
@@ -18,11 +19,9 @@ use Elementary\Template\Cigg\Directives\DirectiveRegistry;
  */
 class Compiler implements CompilerInterface, NodeVisitor
 {
-    private DirectiveRegistry $directiveRegistry;
-
-    public function __construct(DirectiveRegistry $directiveRegistry)
-    {
-        $this->directiveRegistry = $directiveRegistry;
+    public function __construct(
+        private DirectiveRegistry $directiveRegistry
+    ) {
         $this->injectCompilerIntoDirectives();
     }
 
@@ -97,6 +96,12 @@ class Compiler implements CompilerInterface, NodeVisitor
     {
         return $this->compileDirective($node);
     }
+
+    public function visitComponentNode(ComponentNode $node)
+    {
+        return $this->compileComponent($node);
+    }
+
 
     // ========================================================================
     // Directive Compilation Logic
@@ -217,6 +222,53 @@ class Compiler implements CompilerInterface, NodeVisitor
         foreach ($this->directiveRegistry->getAllDirectives() as $directive) {
             $directive->setCompiler($this);
         }
+    }
+
+    // ========================================================================
+    // Component Compilation Logic
+    // ========================================================================
+
+    private function compileComponent(ComponentNode $node): string
+    {
+        $componentName = $node->tagName;
+        $attributes = $node->attributes;
+        $slot = $node->slot;
+
+        
+        // Build attributes array
+        $attributesPhp = '$__attributes = [';
+        foreach ($attributes as $name => $attr) {
+            $value = $attr['value'];
+            $isDynamic = $attr['dynamic'];
+            
+            if ($isDynamic) {
+                // Dynamic attribute (starts with :) - output as PHP variable
+                $attributesPhp .= "\n    '{$name}' => {$value},";
+            } else {
+                // Static attribute - output as string
+                $attributesPhp .= "\n    '{$name}' => " . var_export($value, true) . ",";
+            }
+        }
+        $attributesPhp .= "\n];";
+
+        // Handle slot content
+        $slotPhp = '';
+        if ($slot) {
+            $slotPhp = '$__slot = function() { ob_start(); ?>' . $this->compileNode($slot) . '<?php return ob_get_clean(); };';
+        } else {
+            $slotPhp = '$__slot = function() { return ""; };';
+        }
+
+        // Generate the component render call
+        $renderPhp = "<?php\n";
+        $renderPhp .= "// Component: {$componentName}\n";
+        $renderPhp .= "{$attributesPhp}\n";
+        $renderPhp .= "{$slotPhp}\n";
+        $renderPhp .= "\$__componentPath = '{$componentName}';\n";
+        $renderPhp .= "echo \$this->renderComponent(\$__componentPath, \$__attributes, \$__slot());\n";
+        $renderPhp .= "?>";
+
+        return $renderPhp;
     }
 
     // ========================================================================

@@ -40,13 +40,33 @@ class VerifyCsrfToken implements MiddlewareInterface
 
     private function inExceptArray(Request $request): bool
     {
+        $requestUri = $request->uri();
+        
         // Simple wildcard matching for excluded URIs
         foreach ($this->except as $except) {
+            // Handle root path exception
+            if ($except === '/' && $requestUri === '/') {
+                return true;
+            }
+            
+            // Handle other path exceptions
             if ($except !== '/') {
                 $except = trim($except, '/');
-            }
-            if (str_starts_with(trim($request->uri(), '/'), $except)) {
-                return true;
+                $trimmedUri = trim($requestUri, '/');
+                
+                // Handle wildcard matching for patterns like 'api/*'
+                if (str_ends_with($except, '*')) {
+                    $prefix = rtrim($except, '/*');
+                    // Handle case where URI matches the wildcard pattern
+                    if ($trimmedUri === $prefix || str_starts_with($trimmedUri, $prefix . '/')) {
+                        return true;
+                    }
+                } else {
+                    // Exact match or prefix match
+                    if ($trimmedUri === $except || str_starts_with($trimmedUri, $except . '/')) {
+                        return true;
+                    }
+                }
             }
         }
         return false;

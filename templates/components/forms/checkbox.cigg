@@ -1,0 +1,32 @@
+@php
+    $name = $name ?? '';
+    $id = $id ?? $name;
+    $value = $value ?? '1';
+    $checked = isset($checked) ? 'checked' : '';
+    $required = isset($required) ? 'required' : '';
+    $focusColor = $focusColor ?? 'blue';
+    
+    $colorClasses = match($focusColor) {
+        'green' => 'text-green-600 focus:ring-green-500',
+        'red' => 'text-red-600 focus:ring-red-500', 
+        'blue' => 'text-blue-600 focus:ring-blue-500',
+        default => 'text-blue-600 focus:ring-blue-500'
+    };
+@endphp
+
+<div class="flex items-start">
+    <input 
+        type="checkbox" 
+        id="{{ $id }}" 
+        name="{{ $name }}" 
+        value="{{ $value }}"
+        {{ $checked }}
+        {{ $required }}
+        class="mt-1 h-4 w-4 border-gray-300 rounded focus:ring-2 {{ $colorClasses }}"
+    >
+    @if(isset($label) || $slot)
+        <label for="{{ $id }}" class="ml-3 text-sm text-gray-700">
+            {!! $label ?? $slot !!}
+        </label>
+    @endif
+</div>

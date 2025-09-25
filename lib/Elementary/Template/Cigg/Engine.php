@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Elementary\Template\Cigg;
 
 use Elementary\Config\ConfigBag;
-use Elementary\DI\Container;
 use Elementary\Template\Cigg\Lexer\Lexer;
 use Elementary\Template\Cigg\Parser\Parser;
 use Elementary\Template\Cigg\Compiler\Compiler;
-use Elementary\Template\Cigg\Directives\DirectiveInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Main Cigg Template Engine
@@ -26,7 +25,6 @@ class Engine
         private Parser $parser,
         private Compiler $compiler,
         private LayoutManager $layoutManager,
-        private Container $container,
     ) {
         $this->viewsPath = rtrim($config->get('template.paths.views'), '/');
         $this->cachePath = rtrim($config->get('template.paths.cache'), '/');
@@ -119,10 +117,49 @@ class Engine
     {
         $data['__engine'] = $this;
         $data['__layoutManager'] = $this->layoutManager;
-        $data['__container'] = $this->container;
 
         extract($data);
 
+        ob_start();
+        include $cachePath;
+        return ob_get_clean();
+    }
+
+    /**
+     * Render a component
+     */
+    public function renderComponent(string $componentPath, array $attributes = [], string $slot = ''): string
+    {
+        // Look for the component template
+        $componentTemplatePath = $this->viewsPath . '/components/' . str_replace('.', '/', $componentPath) . '.cigg';
+        
+        if (!file_exists($componentTemplatePath)) {
+            // Try without the components directory (legacy support)
+            $componentTemplatePath = $this->viewsPath . '/' . str_replace('.', '/', $componentPath) . '.cigg';
+            
+            if (!file_exists($componentTemplatePath)) {
+                throw new \Exception("Component template not found: {$componentPath}");
+            }
+        }
+
+        // Compile the component template if needed
+        $cacheKey = md5($componentTemplatePath . serialize($attributes));
+        $cachePath = $this->cachePath . '/component_' . $cacheKey . '.php';
+
+        if ($this->isExpired($componentTemplatePath, $cachePath)) {
+            $this->compileTemplate($componentTemplatePath, $cachePath);
+        }
+
+        // Prepare component data
+        $componentData = array_merge($this->globals, $attributes, [
+            '__slot' => $slot,
+            '__attributes' => $attributes,
+            '__engine' => $this,
+            '__layoutManager' => $this->layoutManager,
+        ]);
+
+        // Render the component
+        extract($componentData);
         ob_start();
         include $cachePath;
         return ob_get_clean();

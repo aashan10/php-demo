@@ -10,7 +10,7 @@ use RuntimeException;
 /**
  * Manages the generation and validation of CSRF tokens.
  */
-final class Csrf
+class Csrf
 {
     private const SESSION_KEY = '_token';
 

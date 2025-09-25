@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+@source "../../templates/**/*.cigg";
+
+/* Custom styles can go here */

@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <title>Test Documentation</title>
+        <style>
+            body {
+                text-rendering: optimizeLegibility;
+                font-family: Source SansSerif Pro, Arial, sans-serif;
+                font-variant-ligatures: common-ligatures;
+                font-kerning: normal;
+                margin-left: 2rem;
+                background-color: #fff;
+                color: #000;
+            }
+
+            body > ul > li {
+                font-size: larger;
+            }
+
+            h2 {
+                font-size: larger;
+                text-decoration-line: underline;
+                text-decoration-thickness: 2px;
+                margin: 0;
+                padding: 0.5rem 0;
+            }
+
+            ul {
+                list-style: none;
+                margin: 0 0 2rem;
+                padding: 0 0 0 1rem;
+                text-indent: -1rem;
+            }
+
+            .success:before {
+                color: #4e9a06;
+                content: '✓';
+                padding-right: 0.5rem;
+            }
+
+            .defect {
+                color: #a40000;
+            }
+
+            .defect:before {
+                color: #a40000;
+                content: '✗';
+                padding-right: 0.5rem;
+            }
+        </style>
+    </head>
+    <body>
+        <h2>Authenticate Api Middleware (Tests\Unit\Authentication\Middleware\AuthenticateApiMiddleware)</h2>
+        <ul>
+            <li class="success">Allows already authenticated user</li>
+            <li class="success">Returns 401 when no api token header</li>
+            <li class="success">Allows request with api token header</li>
+            <li class="success">Handles empty api token header</li>
+            <li class="success">Exact header case required</li>
+            <li class="success">With different api token values</li>
+            <li class="success">With different request methods</li>
+            <li class="success">User interface type check</li>
+            <li class="success">Multiple headers with api token</li>
+            <li class="success">Returns correct unauthorized response</li>
+            <li class="success">Middleware does not modify request</li>
+            <li class="success">With api route patterns</li>
+        </ul>
+        <h2>Authenticate Cookie Middleware (Tests\Unit\Authentication\Middleware\AuthenticateCookieMiddleware)</h2>
+        <ul>
+            <li class="success">Skips if user already authenticated</li>
+            <li class="success">Skips if no cookie</li>
+            <li class="success">Skips if empty cookie</li>
+            <li class="success">Skips if invalid cookie format</li>
+            <li class="success">Skips if user not found</li>
+            <li class="success">Skips if user has no remember token</li>
+            <li class="success">Skips if token does not match</li>
+            <li class="success">Authenticates user with valid cookie</li>
+            <li class="success">Handles numeric user id in cookie</li>
+            <li class="success">Secure token comparison</li>
+            <li class="success">Token hashing consistency</li>
+            <li class="success">Cookie value parsing</li>
+        </ul>
+        <h2>Authenticate Session Middleware (Tests\Unit\Authentication\Middleware\AuthenticateSessionMiddleware)</h2>
+        <ul>
+            <li class="success">Allows already authenticated user</li>
+            <li class="success">Redirects to login when no user id in session</li>
+            <li class="success">Authenticates user from session</li>
+            <li class="success">Redirects when user not found in database</li>
+            <li class="success">Redirects when user is not user interface</li>
+            <li class="success">Sets redirection url from current uri</li>
+            <li class="success">Handles session with string user id</li>
+            <li class="success">Handles invalid user id in session</li>
+            <li class="success">Preserves existing session data</li>
+        </ul>
+        <h2>Compiler (Tests\Unit\Template\Cigg\Compiler\Compiler)</h2>
+        <ul>
+            <li class="success">Compile empty document</li>
+            <li class="success">Compile text node</li>
+            <li class="success">Compile multiple text nodes</li>
+            <li class="success">Compile echo node escaped</li>
+            <li class="success">Compile echo node raw</li>
+            <li class="success">Compile mixed content</li>
+            <li class="success">Compile simple directive</li>
+            <li class="success">Compile json directive</li>
+            <li class="success">Compile if directive block</li>
+            <li class="success">Compile unless directive block</li>
+            <li class="success">Compile foreach directive block</li>
+            <li class="success">Compile section directive</li>
+            <li class="success">Compile nested directives</li>
+            <li class="success">Compile loop directive with times</li>
+            <li class="success">Compile elseif and else directives</li>
+            <li class="success">Compile self closing component</li>
+            <li class="success">Compile component with dynamic attributes</li>
+            <li class="success">Compile component with slot</li>
+            <li class="success">Compile custom directive class</li>
+            <li class="success">Compile custom callable directive</li>
+            <li class="success">Compile unknown directive</li>
+            <li class="success">Compile production directive</li>
+            <li class="success">Compile dump and dd directives</li>
+            <li class="success">Compile break and continue directives</li>
+            <li class="success">Directive registration via compiler</li>
+            <li class="success">Callable directive registration via compiler</li>
+            <li class="success">Is block directive method</li>
+            <li class="success">Is ending directive method</li>
+            <li class="success">Get directive precedence</li>
+            <li class="success">Validate directive nesting</li>
+            <li class="success">Compile node method</li>
+            <li class="success">Complex nested compilation</li>
+        </ul>
+        <h2>Config Bag (Tests\Unit\Config\ConfigBag)</h2>
+        <ul>
+            <li class="success">Constructor throws exception for non existent directory</li>
+            <li class="success">Constructor loads config files</li>
+            <li class="success">Get with dot notation</li>
+            <li class="success">Get returns default for non existent keys</li>
+            <li class="success">Get returns default for invalid path</li>
+            <li class="success">Get can return entire config group</li>
+            <li class="success">Get can return nested arrays</li>
+            <li class="success">Set with dot notation</li>
+            <li class="success">Set creates nested structure</li>
+            <li class="success">Set overwrites existing values</li>
+            <li class="success">Set can overwrite with different data types</li>
+            <li class="success">Set can replace scalar with array</li>
+            <li class="success">All returns all config data</li>
+            <li class="success">All reflects set changes</li>
+            <li class="success">Empty config directory</li>
+            <li class="success">Config file with complex structure</li>
+            <li class="success">Config with various data types</li>
+            <li class="success">Ignores non php files</li>
+        </ul>
+        <h2>Console Kernel (Tests\Unit\Kernel\ConsoleKernel)</h2>
+        <ul>
+            <li class="success">Bootstrap sets up container</li>
+            <li class="success">Bootstrap registers built in commands</li>
+            <li class="defect">Bootstrap discovers custom commands</li>
+            <li class="success">Handle cli with no arguments</li>
+            <li class="success">Handle cli with help command</li>
+            <li class="success">Handle cli with help flag</li>
+            <li class="success">Handle cli with help short flag</li>
+            <li class="success">Handle cli with unknown command</li>
+            <li class="success">Handle cli with valid command</li>
+            <li class="success">Handle cli with command that fails</li>
+            <li class="success">Handle cli with command that throws exception</li>
+            <li class="success">Get command name with valid command</li>
+            <li class="success">Get command name with invalid command</li>
+            <li class="success">Discover commands with non existent directory</li>
+            <li class="success">Handle throws exception</li>
+            <li class="success">Terminate throws exception</li>
+            <li class="success">Terminate cli does nothing</li>
+            <li class="success">Display help with terminal width</li>
+            <li class="success">Display app help</li>
+            <li class="success">Display help for specific command</li>
+            <li class="success">Display help for non existent command</li>
+        </ul>
+        <h2>Container (Tests\Unit\DI\Container)</h2>
+        <ul>
+            <li class="success">Can bind and resolve simple class</li>
+            <li class="success">Can bind with closure</li>
+            <li class="success">Returns existing instance</li>
+            <li class="success">Make creates new instance</li>
+            <li class="success">Can resolve class with dependencies</li>
+            <li class="success">Has returns true for bound services</li>
+            <li class="success">Throws exception for nonexistent class</li>
+            <li class="success">Throws exception for uninstantiable class</li>
+            <li class="success">Throws exception for missing type hint</li>
+            <li class="success">Throws exception for builtin parameter</li>
+            <li class="success">Resolves builtin parameter with default</li>
+        </ul>
+        <h2>Csrf (Tests\Unit\Utils\Csrf)</h2>
+        <ul>
+            <li class="success">Constructor requires dependencies</li>
+            <li class="success">Get token generates new token when none exists</li>
+            <li class="success">Get token returns existing valid token</li>
+            <li class="success">Get token regenerates expired token</li>
+            <li class="success">Validate returns false for null token</li>
+            <li class="success">Validate returns false for empty token</li>
+            <li class="success">Validate returns false when no session token</li>
+            <li class="success">Validate returns false for invalid session token format</li>
+            <li class="success">Validate returns false for missing value in token</li>
+            <li class="success">Validate returns false for missing timestamp in token</li>
+            <li class="success">Validate returns false for expired token</li>
+            <li class="success">Validate returns true for valid token</li>
+            <li class="success">Validate uses hash equals for secure comparison</li>
+            <li class="success">Regenerate token creates new random token</li>
+            <li class="success">Regenerate token creates unique tokens</li>
+            <li class="success">Token expiration with custom lifetime</li>
+            <li class="success">Token expiration boundary conditions</li>
+            <li class="success">Token just within expiration time</li>
+            <li class="success">Complete token workflow</li>
+        </ul>
+        <h2>Directive Registry (Tests\Unit\Template\Cigg\Directives\DirectiveRegistry)</h2>
+        <ul>
+            <li class="success">Constructor creates empty registry</li>
+            <li class="success">Register directive class</li>
+            <li class="success">Register callable directive</li>
+            <li class="success">Get nonexistent directive returns null</li>
+            <li class="success">Register multiple directives</li>
+            <li class="success">Directive names contain both types</li>
+            <li class="success">Has method works for both types</li>
+            <li class="success">Override directive with same name</li>
+            <li class="success">Override callable with same name</li>
+            <li class="success">Directive class takes precedence over callable</li>
+            <li class="success">Remove directive class</li>
+            <li class="success">Remove callable directive</li>
+            <li class="success">Remove both types with same name</li>
+            <li class="success">Remove nonexistent directive</li>
+            <li class="success">Clear removes all directives</li>
+            <li class="success">Get all directives returns only class instances</li>
+            <li class="success">Get all callables returns only callable functions</li>
+            <li class="success">Registry handles complex callable functions</li>
+            <li class="success">Registry handles invokable objects</li>
+            <li class="success">Registry handles array callbacks</li>
+            <li class="success">Registry preserves directive order</li>
+            <li class="success">Edge cases</li>
+        </ul>
+        <h2>Encrypt Cookies (Tests\Unit\Http\Middleware\EncryptCookies)</h2>
+        <ul>
+            <li class="success">Process with no cookies</li>
+            <li class="success">Decrypts cookies on request</li>
+            <li class="success">Handles decryption failure</li>
+            <li class="success">Encrypts cookies on response</li>
+            <li class="success">Skips disabled cookies on decryption</li>
+            <li class="success">Skips disabled cookies on encryption</li>
+            <li class="success">Full workflow</li>
+            <li class="success">Is disabled method</li>
+            <li class="success">With empty except array</li>
+        </ul>
+        <h2>Encryption Service (Tests\Unit\Utils\EncryptionService)</h2>
+        <ul>
+            <li class="success">Constructor throws exception when no encryption key</li>
+            <li class="success">Constructor throws exception when empty encryption key</li>
+            <li class="success">Constructor with valid key</li>
+            <li class="success">Constructor with base 64 key</li>
+            <li class="success">Constructor with custom cipher</li>
+            <li class="success">Encrypt returns string and decrypt returns original value</li>
+            <li class="success">Encrypted value is base 64 encoded</li>
+            <li class="success">Encryption with different data types</li>
+            <li class="success">Encryption produces unique results</li>
+            <li class="success">Decryption with invalid payload</li>
+            <li class="success">Decryption with invalid base 64</li>
+            <li class="success">Decryption with invalid j s o n</li>
+            <li class="success">Decryption with missing required fields</li>
+            <li class="success">Decryption with invalid iv length</li>
+            <li class="success">Decryption with tampered data</li>
+            <li class="success">Decryption with tampered mac</li>
+            <li class="success">Encryption with different keys</li>
+            <li class="success">Encryption with base 64 key</li>
+            <li class="success">Mac verification using hash equals</li>
+            <li class="defect">Encryption fails with invalid cipher</li>
+            <li class="success">Large data encryption</li>
+            <li class="success">Encryption payload structure</li>
+            <li class="success">Consistent encryption between instances</li>
+        </ul>
+        <h2>Engine (Tests\Unit\Template\Cigg\Engine)</h2>
+        <ul>
+            <li class="success">Constructor creates cache directory</li>
+            <li class="success">Get cache path</li>
+            <li class="success">Get views path</li>
+            <li class="defect">Resolve view converts dots to slashes</li>
+            <li class="success">Resolve view throws exception for missing template</li>
+            <li class="defect">Add global variable</li>
+            <li class="success">Render compiled template with data</li>
+            <li class="success">Render compiled template includes engine and layout manager</li>
+            <li class="success">Compile template</li>
+            <li class="success">Is expired returns true in dev environment</li>
+            <li class="success">Is expired checks filemtime in production</li>
+            <li class="success">Is expired returns true when cache file missing</li>
+            <li class="success">Render compiles and renders template</li>
+            <li class="success">Render with layout</li>
+            <li class="defect">Render component self closing</li>
+            <li class="defect">Render component with slot content</li>
+            <li class="defect">Render component fallback to non components directory</li>
+            <li class="success">Render component throws exception for missing template</li>
+            <li class="success">Render uses cache when not expired</li>
+            <li class="success">Render recompiles when expired</li>
+            <li class="success">Engine handles complex template compilation flow</li>
+        </ul>
+        <h2>Engine (Tests\Unit\Template\Engine)</h2>
+        <ul>
+            <li class="success">Get cache path</li>
+            <li class="success">Get views path</li>
+            <li class="success">Resolve view throws exception for nonexistent template</li>
+            <li class="success">Resolve view returns correct path</li>
+            <li class="success">Resolve view handles dotted notation</li>
+            <li class="success">Add global</li>
+            <li class="success">Render with data</li>
+            <li class="success">Compile template</li>
+            <li class="success">Render compiled template</li>
+            <li class="success">Render component throws exception for nonexistent component</li>
+            <li class="success">Render component</li>
+        </ul>
+        <h2>Flash Bag (Tests\Unit\Utils\FlashBag)</h2>
+        <ul>
+            <li class="success">Constructor requires session bag</li>
+            <li class="success">Add stores value with flash prefix</li>
+            <li class="success">Add supports various data types</li>
+            <li class="success">Get retrieves value and removes it</li>
+            <li class="success">Get returns default when value not found</li>
+            <li class="success">Get always removes key after retrieving</li>
+            <li class="success">Has checks for flash key</li>
+            <li class="success">Has returns false when key does not exist</li>
+            <li class="success">All retrieves all flash messages and removes them</li>
+            <li class="success">All returns empty array when no flash messages</li>
+            <li class="success">All handles empty session</li>
+            <li class="success">Flash messages are one time use</li>
+            <li class="success">Multiple flash messages of same type</li>
+            <li class="success">Flash bag with complex data</li>
+            <li class="success">Typical flash message workflow</li>
+            <li class="success">Flash key prefixing</li>
+        </ul>
+        <h2>Guest Middleware (Tests\Unit\Authentication\Middleware\GuestMiddleware)</h2>
+        <ul>
+            <li class="success">Allows guest users</li>
+            <li class="success">Redirects authenticated users</li>
+            <li class="success">Redirects to home for authenticated user</li>
+            <li class="success">Handles null user</li>
+            <li class="success">Handles user interface implementation</li>
+            <li class="success">With different request methods</li>
+            <li class="success">With different guest routes</li>
+            <li class="success">Process return type</li>
+            <li class="success">Redirect response headers</li>
+            <li class="success">User property access</li>
+        </ul>
+        <h2>Http Kernel (Tests\Unit\Kernel\HttpKernel)</h2>
+        <ul>
+            <li class="success">Bootstrap sets up container</li>
+            <li class="success">Bootstrap sets up whoops in development</li>
+            <li class="success">Handle bootstraps if needed</li>
+            <li class="success">Handle with 404 route</li>
+            <li class="success">Handle with valid route</li>
+            <li class="success">Dispatch controller method</li>
+            <li class="success">Resolve middleware method</li>
+            <li class="defect">Dispatch controller with invalid method</li>
+            <li class="success">Dispatch controller with dependency injection</li>
+            <li class="success">Terminate does nothing</li>
+            <li class="success">Handle cli throws exception</li>
+            <li class="success">Terminate cli throws exception</li>
+        </ul>
+        <h2>Kernel Interface (Tests\Unit\Kernel\KernelInterface)</h2>
+        <ul>
+            <li class="success">Http kernel implements kernel interface</li>
+            <li class="success">Console kernel implements kernel interface</li>
+            <li class="success">Http kernel has all required methods</li>
+            <li class="success">Console kernel has all required methods</li>
+            <li class="success">Http kernel bootstrap method</li>
+            <li class="success">Console kernel bootstrap method</li>
+            <li class="success">Http kernel handle returns response</li>
+            <li class="success">Console kernel handle throws exception</li>
+            <li class="success">Http kernel handle cli throws exception</li>
+            <li class="success">Console kernel handle cli returns int</li>
+            <li class="success">Http kernel terminate accepts response</li>
+            <li class="success">Console kernel terminate throws exception</li>
+            <li class="success">Http kernel terminate cli throws exception</li>
+            <li class="success">Console kernel terminate cli accepts int</li>
+            <li class="success">Interface method signatures</li>
+            <li class="success">Kernel contract compliance</li>
+        </ul>
+        <h2>Lexer (Tests\Unit\Template\Cigg\Lexer\Lexer)</h2>
+        <ul>
+            <li class="success">Tokenize empty string</li>
+            <li class="success">Tokenize plain text</li>
+            <li class="success">Tokenize simple echo</li>
+            <li class="success">Tokenize raw echo</li>
+            <li class="success">Tokenize simple directive</li>
+            <li class="success">Tokenize directive without expression</li>
+            <li class="defect">Tokenize escaped at symbol</li>
+            <li class="success">Tokenize component tag</li>
+            <li class="success">Tokenize self closing component</li>
+            <li class="success">Tokenize mixed content</li>
+            <li class="success">Tokenize complex expressions</li>
+            <li class="success">Tokenize nested parentheses in directives</li>
+            <li class="defect">Tokenize multiline content</li>
+            <li class="success">Tokenize line and column tracking</li>
+            <li class="success">Tokenize preserves whitespace in expressions</li>
+            <li class="defect">Tokenize handles incomplete sequences</li>
+            <li class="success">Tokenize style tag context</li>
+            <li class="success">Tokenize script tag context</li>
+            <li class="success">Tokenize attribute context</li>
+            <li class="success">Tokenize directive with complex identifier</li>
+            <li class="success">Tokenize edge cases</li>
+            <li class="defect">Tokenize performance with large input</li>
+            <li class="success">Tokenize unicode content</li>
+        </ul>
+        <h2>Macroable (Tests\Unit\Traits\Macroable)</h2>
+        <ul>
+            <li class="success">Can register and call macro</li>
+            <li class="success">Can register multiple macros</li>
+            <li class="success">Macro can access object properties</li>
+            <li class="success">Macro can call object methods</li>
+            <li class="success">Macro receives arguments correctly</li>
+            <li class="success">Macro can return different types</li>
+            <li class="success">Throws exception for undefined method</li>
+            <li class="success">Existing methods take precedence over macros</li>
+            <li class="success">Macro overrides previous macro with same name</li>
+            <li class="success">Macro can use closures with use statements</li>
+            <li class="success">Macro context is bound to instance</li>
+            <li class="success">Macros are shared across all instances</li>
+            <li class="success">Macro can modify object properties</li>
+            <li class="success">Macro can chain methods</li>
+            <li class="success">Macro with complex logic</li>
+            <li class="success">Macro can call other macros</li>
+            <li class="success">Macro with no arguments</li>
+            <li class="success">Macro can throw exceptions</li>
+            <li class="success">Macro preserves argument types</li>
+            <li class="success">Call macro method directly</li>
+            <li class="success">Call macro prefers existing methods</li>
+            <li class="success">Call macro throws for undefined method</li>
+        </ul>
+        <h2>Middleware Dispatcher (Tests\Unit\Http\MiddlewareDispatcher)</h2>
+        <ul>
+            <li class="success">Dispatch with no middleware</li>
+            <li class="success">Dispatch with single middleware</li>
+            <li class="success">Dispatch with multiple middleware</li>
+            <li class="success">Middleware can modify request</li>
+            <li class="success">Middleware can short circuit</li>
+            <li class="success">Middleware execution order</li>
+            <li class="success">Dispatcher index resets after dispatch</li>
+            <li class="success">Dispatch with container resolution</li>
+        </ul>
+        <h2>Model (Tests\Unit\Database\Model)</h2>
+        <ul>
+            <li class="success">Set container</li>
+            <li class="success">Query</li>
+            <li class="success">Find</li>
+            <li class="success">All</li>
+            <li class="success">Create</li>
+            <li class="success">Update throws exception without primary key</li>
+            <li class="success">Delete throws exception without primary key</li>
+            <li class="success">Get container throws exception when not set</li>
+        </ul>
+        <h2>Node (Tests\Unit\Template\Cigg\AST\Node)</h2>
+        <ul>
+            <li class="success">Document node creation</li>
+            <li class="success">Document node empty children</li>
+            <li class="success">Text node creation</li>
+            <li class="success">Text node empty content</li>
+            <li class="success">Text node multiline content</li>
+            <li class="success">Echo node creation</li>
+            <li class="success">Echo node raw mode</li>
+            <li class="success">Echo node complex expression</li>
+            <li class="success">Directive node simple</li>
+            <li class="success">Directive node without expression</li>
+            <li class="success">Directive node with children</li>
+            <li class="success">Component node self closing</li>
+            <li class="success">Component node with slot</li>
+            <li class="success">Component node dynamic attributes</li>
+            <li class="success">Visitor pattern document node</li>
+            <li class="success">Visitor pattern text node</li>
+            <li class="success">Visitor pattern echo node</li>
+            <li class="success">Visitor pattern directive node</li>
+            <li class="success">Visitor pattern component node</li>
+            <li class="success">Nodes are mutable</li>
+            <li class="success">Nested node structures</li>
+            <li class="success">Node type consistency</li>
+        </ul>
+        <h2>Parameter Bag (Tests\Unit\Utils\ParameterBag)</h2>
+        <ul>
+            <li class="success">Constructor with empty parameters</li>
+            <li class="success">Constructor with parameters</li>
+            <li class="success">Get existing parameter</li>
+            <li class="success">Get non existent parameter returns default</li>
+            <li class="success">Get supports various data types</li>
+            <li class="success">Has returns true for existing parameters</li>
+            <li class="success">Has returns false for non existent parameters</li>
+            <li class="success">Has returns false for null values</li>
+            <li class="success">Set and get</li>
+            <li class="success">Set overwrites existing value</li>
+            <li class="success">Remove deletes parameter</li>
+            <li class="success">Remove non existent key does not throw</li>
+            <li class="success">Clear removes all parameters</li>
+            <li class="success">All returns all parameters</li>
+            <li class="success">Only returns specified keys</li>
+            <li class="success">Only with non existent keys</li>
+            <li class="success">Only with empty array</li>
+            <li class="success">Is empty returns true for empty bag</li>
+            <li class="success">Is empty returns false for non empty bag</li>
+            <li class="success">Is empty returns true after clear</li>
+            <li class="success">Is empty returns true after removing all items</li>
+            <li class="success">Chained operations</li>
+        </ul>
+        <h2>Parser (Tests\Unit\Template\Cigg\Parser\Parser)</h2>
+        <ul>
+            <li class="success">Parse empty tokens</li>
+            <li class="success">Parse plain text</li>
+            <li class="success">Parse simple echo</li>
+            <li class="success">Parse raw echo</li>
+            <li class="success">Parse simple directive</li>
+            <li class="success">Parse directive with expression</li>
+            <li class="success">Parse block directive</li>
+            <li class="success">Parse nested block directives</li>
+            <li class="success">Parse component self closing</li>
+            <li class="success">Parse component with slot</li>
+            <li class="success">Parse component dynamic attributes</li>
+            <li class="defect">Parse mixed content</li>
+            <li class="success">Parse ending directive</li>
+            <li class="success">Parse expression without parentheses</li>
+            <li class="success">Parse malformed component tag</li>
+            <li class="success">Parse complex nested structure</li>
+            <li class="success">Parse unknown tokens are ignored</li>
+            <li class="success">Parse preserves token order</li>
+            <li class="success">Parse closing component tags without opening prevents infinite loop</li>
+        </ul>
+        <h2>Router (Tests\Unit\Routing\Router)</h2>
+        <ul>
+            <li class="success">Can create get route</li>
+            <li class="success">Can create post route</li>
+            <li class="success">Can create put route</li>
+            <li class="success">Can create delete route</li>
+            <li class="success">Can create patch route</li>
+            <li class="success">Can create route with multiple methods</li>
+            <li class="success">Can create route with all methods</li>
+            <li class="success">Can create named route</li>
+            <li class="success">Can create route with middleware</li>
+            <li class="success">Can create route with multiple middleware</li>
+            <li class="success">Can create route group</li>
+            <li class="success">Can create nested route groups</li>
+            <li class="success">Can create route group with middleware</li>
+            <li class="success">Can create route group with multiple middleware</li>
+            <li class="success">Route groups stack correctly</li>
+            <li class="success">Routes are added to collection</li>
+        </ul>
+        <h2>Session Bag (Tests\Unit\Utils\SessionBag)</h2>
+        <ul>
+            <li class="success">Constructor does not start session</li>
+            <li class="success">Get returns value from session</li>
+            <li class="success">Get returns default for non existent key</li>
+            <li class="success">Get supports various data types</li>
+            <li class="success">Set stores value in session</li>
+            <li class="success">Set overwrites existing value</li>
+            <li class="success">Set supports various data types</li>
+            <li class="success">Has returns true for existing keys</li>
+            <li class="success">Has returns false for non existent keys</li>
+            <li class="success">Has returns false for null values</li>
+            <li class="success">Has returns true for falsy but set values</li>
+            <li class="success">Remove deletes key from session</li>
+            <li class="success">Remove non existent key does not throw</li>
+            <li class="success">All returns entire session array</li>
+            <li class="success">All returns empty array when session empty</li>
+            <li class="success">Clear removes all session data</li>
+            <li class="defect">Destroy calls clear and session destroy</li>
+            <li class="success">Session bag works with complex data</li>
+            <li class="success">Chained operations</li>
+        </ul>
+        <h2>Start Session (Tests\Unit\Http\Middleware\StartSession)</h2>
+        <ul>
+            <li class="success">Skips if session already active</li>
+            <li class="success">Starts new session</li>
+            <li class="success">Uses custom session lifetime</li>
+            <li class="success">Uses existing session id from cookie</li>
+            <li class="success">Ignores invalid session id from cookie</li>
+            <li class="success">Sets session cookie on response</li>
+            <li class="success">Does not set cookie if session id unchanged</li>
+            <li class="success">Session cookie parameters</li>
+            <li class="success">Handles empty session cookie</li>
+            <li class="success">Session starts without cookies</li>
+            <li class="success">Response contains new session id</li>
+        </ul>
+        <h2>Token (Tests\Unit\Template\Cigg\Token\Token)</h2>
+        <ul>
+            <li class="success">Constructor sets properties correctly</li>
+            <li class="success">Constructor with default line and column</li>
+            <li class="success">ToString formats token correctly</li>
+            <li class="success">ToString with empty value</li>
+            <li class="success">ToString with special characters</li>
+            <li class="success">Token properties are public</li>
+            <li class="success">Token with multiline content</li>
+            <li class="success">Token with various token types</li>
+            <li class="success">Token immutability concerns</li>
+            <li class="success">Token edge cases</li>
+        </ul>
+        <h2>Token Type (Tests\Unit\Template\Cigg\Token\TokenType)</h2>
+        <ul>
+            <li class="success">All token types are defined</li>
+            <li class="success">Token type values</li>
+            <li class="success">Token types are unique</li>
+            <li class="success">Token type constants are strings</li>
+            <li class="success">Echo token pairs</li>
+            <li class="success">Parentheses token pairs</li>
+            <li class="success">Special tokens</li>
+            <li class="success">Content tokens</li>
+            <li class="success">Reflection access to constants</li>
+            <li class="success">Token type naming convention</li>
+            <li class="success">Can use token types in arrays</li>
+            <li class="success">Can use token types in switch statements</li>
+        </ul>
+        <h2>Trim Strings (Tests\Unit\Http\Middleware\TrimStrings)</h2>
+        <ul>
+            <li class="success">Process with no post data</li>
+            <li class="success">Trims string values</li>
+            <li class="success">Does not trim non string values</li>
+            <li class="success">Trims empty strings</li>
+            <li class="success">Trims string with internal whitespace</li>
+            <li class="success">Handles special characters</li>
+            <li class="success">Process with mixed data types</li>
+            <li class="success">Does not modify original array</li>
+            <li class="success">Process with get request</li>
+            <li class="success">Large post data</li>
+            <li class="success">String with only whitespace</li>
+        </ul>
+        <h2>Uploaded File (Tests\Unit\Utils\UploadedFile)</h2>
+        <ul>
+            <li class="success">Constructor with all parameters</li>
+            <li class="success">Constructor is readonly</li>
+            <li class="success">Get extension returns correct extension</li>
+            <li class="success">Get mime type returns type</li>
+            <li class="success">Move with valid file</li>
+            <li class="success">Move calls move uploaded file</li>
+            <li class="success">Delete with existing file</li>
+            <li class="success">Delete with non existent file</li>
+            <li class="success">Upload error codes</li>
+            <li class="success">Various file sizes</li>
+            <li class="success">Common file types</li>
+            <li class="success">File with special characters in name</li>
+            <li class="success">Large file handling</li>
+            <li class="success">Uploaded file with empty name</li>
+            <li class="success">Uploaded file immutability</li>
+            <li class="defect">Typical web upload scenario</li>
+        </ul>
+        <h2>Validator (Tests\Unit\Validation\Validator)</h2>
+        <ul>
+            <li class="success">Constructor sets data and rules</li>
+            <li class="success">Passes returns true for valid data</li>
+            <li class="success">Fails returns true for invalid data</li>
+            <li class="success">Errors returns parameter bag</li>
+            <li class="success">Required rule fails for empty string</li>
+            <li class="success">Required rule fails for null</li>
+            <li class="success">Required rule fails for missing field</li>
+            <li class="success">Required rule passes for non empty string</li>
+            <li class="success">Required rule passes for zero</li>
+            <li class="success">Email rule passes for valid emails</li>
+            <li class="success">Email rule fails for invalid emails</li>
+            <li class="success">Email rule skips validation for empty value</li>
+            <li class="success">Min length rule passes for sufficient length</li>
+            <li class="success">Min length rule fails for insufficient length</li>
+            <li class="success">Min length rule skips validation for empty value</li>
+            <li class="success">Min length rule trims whitespace</li>
+            <li class="success">Equals rule passes for matching values</li>
+            <li class="success">Equals rule fails for different values</li>
+            <li class="success">Equals rule fails when comparison field missing</li>
+            <li class="success">Equals rule skips validation for empty value</li>
+            <li class="success">Multiple rules for single field</li>
+            <li class="success">Multiple fields with different rules</li>
+            <li class="success">Complex validation scenario</li>
+            <li class="success">Macro can be added</li>
+            <li class="success">Macro validation fails</li>
+            <li class="success">Macro with parameters</li>
+            <li class="success">Undefined validation rule throws exception</li>
+            <li class="success">Built in rules have precedence over macros</li>
+            <li class="success">Multiple macros can be registered</li>
+            <li class="success">Macro access to validator internals</li>
+            <li class="success">Validator can be extended with complex macros</li>
+        </ul>
+        <h2>Verify Csrf Token (Tests\Unit\Http\Middleware\VerifyCsrfToken)</h2>
+        <ul>
+            <li class="success">Allows reading methods</li>
+            <li class="success">Blocks writing methods without token</li>
+            <li class="success">Allows writing methods with valid token in post</li>
+            <li class="success">Allows writing methods with valid token in header</li>
+            <li class="success">Prefers post token over header</li>
+            <li class="success">Allows excluded uris</li>
+            <li class="success">Does not exclude non matching uris</li>
+            <li class="success">Root path exclusion</li>
+            <li class="success">Invalid token returns 419</li>
+            <li class="success">Is reading method</li>
+            <li class="success">In except array method</li>
+            <li class="success">Tokens match method</li>
+        </ul>
+    </body>
+</html>
