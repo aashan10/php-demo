@@ -32,3 +32,4 @@ The framework is broken down into several components. For detailed information o
 | 11 | [Asset Bundling (Vite)](./docs/11-asset-bundling.md) | How to bundle frontend assets with Vite. |
 | 12 | [Components (Cigg)](./docs/12-components.md) | How to create reusable UI components. |
 | 13 | [Testing](./docs/13-testing.md) | How to write and run tests with PHPUnit. |
+| 14 | [Spark Components](./docs/spark/README.md) | How to build reactive, server-side components. |
