@@ -7,7 +7,6 @@ namespace Elementary\Spark;
 use Elementary\Template\Cigg\Engine;
 use Elementary\Http\Request;
 use Elementary\Http\Response;
-use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use ReflectionProperty;
 
@@ -18,27 +17,15 @@ abstract class SparkComponent
     protected array $listeners = [];
     protected string $componentId;
     protected Engine $engine;
-    protected ?LoggerInterface $logger = null;
     
-    public function __construct(Engine $engine, ?LoggerInterface $logger = null)
+    public function __construct(Engine $engine)
     {
         $this->engine = $engine;
-        $this->logger = $logger;
         $this->componentId = $this->generateComponentId();
-        
-        $this->log('debug', 'SparkComponent created', [
-            'component' => get_class($this),
-            'id' => $this->componentId
-        ]);
         
         try {
             $this->mount();
-            $this->log('debug', 'Component mounted successfully');
         } catch (\Throwable $e) {
-            $this->log('error', 'Component mount failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
             throw new \RuntimeException("Failed to mount component " . get_class($this) . ": " . $e->getMessage(), 0, $e);
         }
     }
@@ -154,25 +141,10 @@ abstract class SparkComponent
      */
     public function syncInput(array $updates): void
     {
-        $this->log('debug', 'Syncing input data', ['updates' => $updates]);
-        
         foreach ($updates as $property => $value) {
             if ($this->isPublicProperty($property)) {
-                $oldValue = $this->$property ?? null;
                 $this->$property = $value;
-                
-                $this->log('debug', 'Property updated', [
-                    'property' => $property,
-                    'old_value' => $oldValue,
-                    'new_value' => $value
-                ]);
             } else {
-                $this->log('warning', 'Attempted to sync non-public property', [
-                    'property' => $property,
-                    'value' => $value,
-                    'component' => get_class($this)
-                ]);
-                
                 throw new \InvalidArgumentException("Property '{$property}' is not public and cannot be synced on component " . get_class($this));
             }
         }
@@ -197,40 +169,17 @@ abstract class SparkComponent
      */
     public function callMethod(string $method, array $params = []): void
     {
-        $this->log('debug', 'Method call requested', [
-            'method' => $method,
-            'params' => $params,
-            'component' => get_class($this)
-        ]);
-        
         if (!method_exists($this, $method)) {
-            $this->log('error', 'Method does not exist', [
-                'method' => $method,
-                'component' => get_class($this)
-            ]);
             throw new \BadMethodCallException("Method '{$method}' does not exist on component " . get_class($this));
         }
         
         if (!$this->isPublicMethod($method)) {
-            $this->log('error', 'Method is not public', [
-                'method' => $method,
-                'component' => get_class($this)
-            ]);
             throw new \BadMethodCallException("Method '{$method}' is not public on component " . get_class($this));
         }
         
         try {
-            $result = $this->$method(...$params);
-            $this->log('debug', 'Method executed successfully', [
-                'method' => $method,
-                'result_type' => gettype($result)
-            ]);
+            $this->$method(...$params);
         } catch (\Throwable $e) {
-            $this->log('error', 'Method execution failed', [
-                'method' => $method,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
             throw new \RuntimeException("Method '{$method}' failed on component " . get_class($this) . ": " . $e->getMessage(), 0, $e);
         }
     }
@@ -295,7 +244,7 @@ abstract class SparkComponent
     protected function emit(string $event, mixed $data = null): void
     {
         // This will be handled by the SparkComponentManager
-        SparkComponentManager::getInstance()->addEvent($event, $data);
+        SparkManager::getInstance()->addEvent($event, $data);
     }
 
     /**
@@ -333,11 +282,6 @@ abstract class SparkComponent
      */
     public function toHtml(): string
     {
-        $this->log('debug', 'Rendering component to HTML', [
-            'component' => get_class($this),
-            'id' => $this->componentId
-        ]);
-        
         try {
             // Get compiled template path
             $cachePath = $this->getCompiledTemplate();
@@ -352,15 +296,7 @@ abstract class SparkComponent
             include $cachePath;
             $content = ob_get_clean();
             
-            $this->log('debug', 'Component template included successfully', [
-                'content_length' => strlen($content),
-                'template_path' => $cachePath
-            ]);
         } catch (\Throwable $e) {
-            $this->log('error', 'Component render failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
             throw new \RuntimeException("Failed to render component " . get_class($this) . ": " . $e->getMessage(), 0, $e);
         }
         
@@ -376,26 +312,6 @@ abstract class SparkComponent
             $attributeString .= ' ' . $key . '="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '"';
         }
         
-        $html = "<div{$attributeString}>{$content}</div>";
-        
-        $this->log('debug', 'Component HTML generated successfully', [
-            'html_length' => strlen($html),
-            'state_size' => strlen(json_encode($state)),
-            'raw_content_length' => strlen($content)
-        ]);
-        
-        return $html;
-    }
-    
-    /**
-     * Log a message if logger is available
-     */
-    protected function log(string $level, string $message, array $context = []): void
-    {
-        if ($this->logger) {
-            $context['spark_component'] = get_class($this);
-            $context['component_id'] = $this->componentId;
-            $this->logger->log($level, "[Spark] {$message}", $context);
-        }
+        return "<div{$attributeString}>{$content}</div>";
     }
 }

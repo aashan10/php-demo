@@ -83,8 +83,8 @@ class SparkManager
         }
 
         try {
-            // Create component with logger dependency
-            $obj = new $class($engine, $this->logger);
+            // Create component
+            $obj = new $class($engine);
             $this->log('debug', 'Component instance created', ['class' => $class]);
         } catch (\Throwable $e) {
             $this->log('error', 'Failed to create component', [
