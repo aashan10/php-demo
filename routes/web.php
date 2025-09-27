@@ -26,3 +26,6 @@ Router::middleware('auth')->group(function() {
     Router::post('/users/create', UserController::class . '@store')->name('users.store');
     Router::get('/users/create', UserController::class . '@create')->name('users.create');
 });
+
+// Spark test route (accessible to all)
+Router::get('/spark-test', App\Controllers\SparkTestController::class. '@index');

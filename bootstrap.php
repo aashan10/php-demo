@@ -19,6 +19,7 @@ use Elementary\Validation\Validator;
 use Elementary\Database\QueryBuilder;
 use Elementary\Utils\EncryptionService;
 use Elementary\Session\SessionManager;
+use Elementary\Spark\SparkComponentManager;
 use Psr\Log\LoggerInterface;
 
 Validator::macro('validateName', function ($data) {
@@ -115,3 +116,14 @@ $container->bind(DirectiveRegistry::class, function(Container $c) {
 
 
 Model::setContainer($container);
+
+// Bind SparkComponentManager
+$container->bind(SparkComponentManager::class, function(Container $c) {
+    return new SparkComponentManager($c);
+});
+
+// Register Live Components
+$sparkConfig = require BASE_PATH . '/config/spark.php';
+foreach ($sparkConfig['components'] as $name => $className) {
+    \Elementary\Spark\SparkComponentRegistry::register($name, $className);
+}

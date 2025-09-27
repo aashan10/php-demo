@@ -73,7 +73,7 @@ class Engine
             $this->compileTemplate($templatePath, $cachePath);
         }
 
-        $content = $this->renderCompiledTemplate($cachePath, array_merge($this->globals, $data));
+        $content = $this->renderCompiledTemplate($cachePath, $data);
 
         if ($layout = $this->layoutManager->getLayout()) {
             $this->layoutManager->clearLayout();
@@ -115,6 +115,7 @@ class Engine
 
     public function renderCompiledTemplate(string $cachePath, array $data): string
     {
+        $data = array_merge($this->globals, $data);
         $data['__engine'] = $this;
         $data['__layoutManager'] = $this->layoutManager;
 
@@ -130,6 +131,15 @@ class Engine
      */
     public function renderComponent(string $componentPath, array $attributes = [], string $slot = ''): string
     {
+        // Debug logging
+        error_log("[Engine] Rendering component: {$componentPath}");
+        
+        // Check if this is a spark component (starts with 'ui-spark-')
+        if (str_starts_with($componentPath, 'spark-')) {
+            error_log("[Engine] Detected spark component, delegating to renderSparkComponent");
+            return $this->renderSparkComponent($componentPath, $attributes, $slot);
+        }
+        
         // Look for the component template
         $componentTemplatePath = $this->viewsPath . '/components/' . str_replace('.', '/', $componentPath) . '.cigg';
         
@@ -163,5 +173,53 @@ class Engine
         ob_start();
         include $cachePath;
         return ob_get_clean();
+    }
+    
+    /**
+     * Render a live component
+     */
+    private function renderSparkComponent(string $componentPath, array $attributes = [], string $slot = ''): string
+    {
+        // Remove 'ui-spark-' prefix to get component name
+        $componentName = substr($componentPath, 6); // Remove 'ui-spark-'
+        error_log("[Engine] Spark component name: {$componentName}");
+        
+        try {
+            // Debug registry state
+            $registeredComponents = \Elementary\Spark\SparkComponentRegistry::all();
+            error_log("[Engine] Registered components: " . json_encode(array_keys($registeredComponents)));
+            
+            // Get the registered component class
+            if (!\Elementary\Spark\SparkComponentRegistry::has($componentName)) {
+                throw new \Exception("Live component '{$componentName}' is not registered. Available: " . implode(', ', array_keys($registeredComponents)));
+            }
+            
+            $className = \Elementary\Spark\SparkComponentRegistry::get($componentName);
+            error_log("[Engine] Found component class: {$className}");
+            
+            // Get the SparkComponentManager from globals
+            if (!isset($this->globals['__container'])) {
+                throw new \Exception('Container not available for live component rendering');
+            }
+            
+            $container = $this->globals['__container'];
+            $manager = $container->get('Elementary\\Spark\\SparkManager');
+            error_log("[Engine] Got manager, calling renderComponent");
+            
+            $result = $manager->renderComponent($className, $attributes);
+            error_log("[Engine] Component rendered successfully, length: " . strlen($result));
+            
+            return $result;
+            
+        } catch (\Throwable $e) {
+            error_log("[Engine] Live component error: " . $e->getMessage());
+            // Return error display for debugging
+            return '<div style="color: red; border: 1px solid red; padding: 10px; margin: 10px;">' .
+                   '<strong>Live Component Error:</strong> ' . htmlspecialchars($e->getMessage()) .
+                   '<br><strong>Component:</strong> ' . $componentName .
+                   '<br><strong>Available components:</strong> ' . implode(', ', array_keys(\Elementary\Spark\SparkComponentRegistry::all())) .
+                   '<br><strong>File:</strong> ' . $e->getFile() . ':' . $e->getLine() .
+                   '</div>';
+        }
     }
 }

@@ -92,4 +92,8 @@ final class Request {
     public function isMethod(string $method): bool {
         return strtoupper($this->method()) === strtoupper($method);
     }
+
+    public function body(): ?string {
+        return $this->content;
+    }
 }

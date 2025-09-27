@@ -53,6 +53,9 @@ class HttpKernel implements KernelInterface
         Router::middleware('web')->group(function () {
             require_once BASE_PATH . '/routes/web.php';
         });
+        
+        // Load Spark routes
+        require_once BASE_PATH . '/routes/spark.php';
     }
 
     public function handle(): Response

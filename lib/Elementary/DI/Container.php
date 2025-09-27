@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Elementary\DI;
 
 use Elementary\DI\Exceptions\ContainerException;
+use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionParameter;
 
-class Container
+class Container implements ContainerInterface
 {
     private array $bindings = [];
     private array $instances = [];

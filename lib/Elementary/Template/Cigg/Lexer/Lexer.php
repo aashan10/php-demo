@@ -51,8 +51,7 @@ private string $input;
             if (!$this->inSpecialContext()) {
                 if ($char === '<' && (str_starts_with($this->peek(4), '<ui-') || str_starts_with($this->peek(5), '</ui-'))) {
                     if ($textBuffer) {
-                        $tokens[] = new Token(TokenType::T_TEXT, $textBuffer, $this->line, $this->column - strlen($textBuffer));
-                        $textBuffer = '';
+                        $this->flushTextBuffer($tokens, $textBuffer);
                     }
 
                     $tagContent = $this->scanTag();
@@ -63,8 +62,7 @@ private string $input;
                 if ($char === '{') {
                     // Flush any accumulated text
                     if ($textBuffer) {
-                        $tokens[] = new Token(TokenType::T_TEXT, $textBuffer, $this->line, $this->column - strlen($textBuffer));
-                        $textBuffer = '';
+                        $this->flushTextBuffer($tokens, $textBuffer);
                     }
 
                     $specialTokens = $this->scanTemplateSequence();
@@ -75,10 +73,18 @@ private string $input;
                         $textBuffer .= $char;
                         $this->advance();
                     }
-                } elseif ($char === '@') {                    // Flush any accumulated text
+                } elseif ($char === '@') {
+                    // Check for escaped @@ first
+                    if ($this->peek(2) === '@@') {
+                        $textBuffer .= '@'; // Escaped @@ becomes single @
+                        $this->advance(); // @
+                        $this->advance(); // @
+                        continue;
+                    }
+                    
+                    // Flush any accumulated text
                     if ($textBuffer) {
-                        $tokens[] = new Token(TokenType::T_TEXT, $textBuffer, $this->line, $this->column - strlen($textBuffer));
-                        $textBuffer = '';
+                        $this->flushTextBuffer($tokens, $textBuffer);
                     }
 
                     $directiveTokens = $this->scanDirective();
@@ -100,9 +106,9 @@ private string $input;
             }
         }
 
-        // Flush any remaining text
+        // Flush any remaining text, handling newlines properly
         if ($textBuffer) {
-            $tokens[] = new Token(TokenType::T_TEXT, $textBuffer, $this->line, $this->column - strlen($textBuffer));
+            $this->flushTextBuffer($tokens, $textBuffer);
         }
 
         $tokens[] = new Token(TokenType::T_EOF, '', $this->line, $this->column);
@@ -153,14 +159,21 @@ private string $input;
         $startLine = $this->line;
         $startColumn = $this->column;
 
-        // Check for {{
+        // Check for complete {{
         if ($this->peek(2) === '{{') {
-            return $this->scanEcho($startLine, $startColumn);
+            // Check if there's a closing }} somewhere ahead
+            $remaining = substr($this->input, $this->position + 2);
+            if (strpos($remaining, '}}') !== false) {
+                return $this->scanEcho($startLine, $startColumn);
+            }
         }
 
-        // Check for {!!
+        // Check for complete {!!
         if ($this->peek(3) === '{!!') {
-            return $this->scanRawEcho($startLine, $startColumn);
+            $remaining = substr($this->input, $this->position + 3);
+            if (strpos($remaining, '!!}') !== false) {
+                return $this->scanRawEcho($startLine, $startColumn);
+            }
         }
 
         return null;
@@ -232,13 +245,6 @@ private string $input;
     {
         $startLine = $this->line;
         $startColumn = $this->column;
-
-        // Check for escaped @@
-        if ($this->peek(2) === '@@') {
-            $this->advance(); // @
-            $this->advance(); // @
-            return [new Token(TokenType::T_TEXT, '@@', $startLine, $startColumn)];
-        }
 
         $tokens = [];
         
@@ -379,5 +385,38 @@ private string $input;
     private function isAtEnd(): bool
     {
         return $this->position >= $this->length;
+    }
+    
+    private function flushTextBuffer(array &$tokens, string &$textBuffer): void
+    {
+        if (!$textBuffer) return;
+        
+        // Optimized version: manually split on newlines for better performance
+        $pos = 0;
+        $len = strlen($textBuffer);
+        
+        while ($pos < $len) {
+            $nlPos = strpos($textBuffer, "\n", $pos);
+            
+            if ($nlPos === false) {
+                // No more newlines, add remaining text
+                if ($pos < $len) {
+                    $tokens[] = new Token(TokenType::T_TEXT, substr($textBuffer, $pos), $this->line, $this->column);
+                }
+                break;
+            }
+            
+            // Add text before newline if any
+            if ($nlPos > $pos) {
+                $tokens[] = new Token(TokenType::T_TEXT, substr($textBuffer, $pos, $nlPos - $pos), $this->line, $this->column);
+            }
+            
+            // Add the newline
+            $tokens[] = new Token(TokenType::T_TEXT, "\n", $this->line, $this->column);
+            
+            $pos = $nlPos + 1;
+        }
+        
+        $textBuffer = '';
     }
 }

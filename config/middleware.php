@@ -8,6 +8,9 @@ use Elementary\Authentication\Middleware\AuthenticateApiMiddleware;
 use Elementary\Authentication\Middleware\AuthenticateCookieMiddleware;
 use Elementary\Authentication\Middleware\AuthenticateSessionMiddleware;
 use Elementary\Http\Middleware\VerifyCsrfToken;
+use Elementary\Spark\Middleware\ValidateJsonPayload;
+use Elementary\Spark\Middleware\ValidateSparkRequest;
+use Elementary\Spark\Middleware\ValidateSparkChecksum;
 
 return [
     /*
@@ -50,6 +53,11 @@ return [
         ],
         'guest' => [
             GuestMiddleware::class,
+        ],
+        'spark' => [
+            ValidateJsonPayload::class,
+            ValidateSparkRequest::class,
+            // ValidateSparkChecksum::class, // TODO: Enable once client-side checksum calculation is implemented
         ]
     ]
 ];
