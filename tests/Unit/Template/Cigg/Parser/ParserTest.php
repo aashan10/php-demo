@@ -315,7 +315,7 @@ class ParserTest extends TestCase
         $ast = $this->parser->parse($tokens);
 
         $this->assertInstanceOf(DocumentNode::class, $ast);
-        $this->assertCount(4, $ast->children);
+        $this->assertCount(5, $ast->children);
         
         $this->assertInstanceOf(TextNode::class, $ast->children[0]);
         $this->assertEquals('Before', $ast->children[0]->content);

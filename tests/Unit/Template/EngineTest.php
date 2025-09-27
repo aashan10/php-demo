@@ -85,6 +85,7 @@ class EngineTest extends TestCase
     {
         $templateContent = '<h1>Test</h1>';
         file_put_contents($this->viewsDir . '/test.cigg', $templateContent);
+        clearstatcache();
         
         $resolvedPath = $this->engine->resolveView('test');
         
@@ -96,6 +97,7 @@ class EngineTest extends TestCase
         mkdir($this->viewsDir . '/auth');
         $templateContent = '<form>Login</form>';
         file_put_contents($this->viewsDir . '/auth/login.cigg', $templateContent);
+        clearstatcache();
         
         $resolvedPath = $this->engine->resolveView('auth.login');
         
@@ -106,6 +108,7 @@ class EngineTest extends TestCase
     {
         $templateContent = '{{ $globalVar }}';
         file_put_contents($this->viewsDir . '/test.cigg', $templateContent);
+        clearstatcache();
         
         $this->engine->addGlobal('globalVar', 'global value');
         
@@ -117,6 +120,7 @@ class EngineTest extends TestCase
     {
         $templateContent = 'Hello {{ $name }}!';
         file_put_contents($this->viewsDir . '/greeting.cigg', $templateContent);
+        clearstatcache();
         
         $result = $this->engine->render('greeting', ['name' => 'World']);
         
@@ -130,6 +134,7 @@ class EngineTest extends TestCase
         $cachePath = $this->tempDir . '/cache/test.php';
         
         file_put_contents($templatePath, $templateContent);
+        clearstatcache();
         
         $this->engine->compileTemplate($templatePath, $cachePath);
         
@@ -144,6 +149,7 @@ class EngineTest extends TestCase
         $cachePath = $this->tempDir . '/cache/compiled.php';
         
         file_put_contents($cachePath, $compiledContent);
+        clearstatcache();
         
         $result = $this->engine->renderCompiledTemplate($cachePath, ['message' => 'Hello']);
         
@@ -163,6 +169,7 @@ class EngineTest extends TestCase
         mkdir($this->viewsDir . '/components');
         $componentContent = '<button class="{{ $class }}">{{ $__slot }}</button>';
         file_put_contents($this->viewsDir . '/components/button.cigg', $componentContent);
+        clearstatcache();
         
         $result = $this->engine->renderComponent('button', ['class' => 'btn'], 'Click me');
         

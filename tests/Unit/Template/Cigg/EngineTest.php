@@ -29,6 +29,7 @@ class EngineTest extends TestCase
         // Create temporary directories for testing
         $this->tempDir = sys_get_temp_dir() . '/cigg_test_' . uniqid();
         mkdir($this->tempDir . '/views', 0755, true);
+        mkdir($this->tempDir . '/views/components', 0755, true);
         mkdir($this->tempDir . '/cache', 0755, true);
         
         $this->config = $this->createMock(ConfigBag::class);
@@ -114,6 +115,9 @@ class EngineTest extends TestCase
 
     public function test_resolve_view_converts_dots_to_slashes()
     {
+        // Create the users subdirectory
+        mkdir($this->tempDir . '/views/users', 0755, true);
+        
         $templateContent = 'Hello {{ $name }}';
         file_put_contents($this->tempDir . '/views/users/profile.cigg', $templateContent);
         
@@ -382,7 +386,7 @@ class EngineTest extends TestCase
                     ->willReturn($componentAst);
         
         $this->compiler->method('compile')
-                      ->with('component_ast')
+                      ->with($componentAst)
                       ->willReturn($compiledContent);
         
         $result = $this->engine->renderComponent('button', ['text' => 'Submit']);
@@ -412,7 +416,7 @@ class EngineTest extends TestCase
                     ->willReturn($componentAst);
         
         $this->compiler->method('compile')
-                      ->with('component_ast')
+                      ->with($componentAst)
                       ->willReturn($compiledContent);
         
         $result = $this->engine->renderComponent('card', ['title' => 'My Card'], 'Card content here');
@@ -443,7 +447,7 @@ class EngineTest extends TestCase
                     ->willReturn($componentAst);
         
         $this->compiler->method('compile')
-                      ->with('component_ast')
+                      ->with($componentAst)
                       ->willReturn($compiledContent);
         
         $result = $this->engine->renderComponent('legacy-component', ['value' => 'test']);
