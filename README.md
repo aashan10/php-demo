@@ -1,6 +1,11 @@
-# My Awesome App (Powered by the Elementary Framework)
+# The Elementary Framework
 
-This is a custom PHP application built with the Elementary framework, a lightweight, modern framework designed for simplicity and performance. It features a dependency injection container, a flexible router, a custom templating engine (Cigg), and a powerful command-line interface.
+Elementary is a modern, high-performance PHP framework built from the ground up with **zero production dependencies**. It is designed for developers who value speed, simplicity, and full-stack control. While it includes all the essential features of a modern framework—such as a dependency injection container, a fluent router, and a lightweight Active Record implementation—it stands out with its unique, custom-built components:
+
+-   **Spark:** A reactive, server-side component system inspired by Laravel Livewire, allowing you to build dynamic interfaces with minimal JavaScript.
+-   **Cigg:** A custom-built, high-performance templating engine with an intuitive syntax and compile-time optimizations.
+-   **Zero-Dependency Architecture:** An incredibly lightweight and fast core, offering maximum performance and complete control over the codebase.
+-   **Modern Tooling:** Comes pre-configured with Vite for asset bundling and Tailwind CSS for styling.
 
 This project is set up to run in a Docker environment for easy and consistent development.
 
