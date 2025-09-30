@@ -6,6 +6,7 @@ namespace Elementary\Database\Schema;
 
 use Elementary\Database\Contracts\SchemaBuilderInterface;
 use Elementary\Database\Drivers\MySQLDriver;
+use Elementary\Database\Schema\Blueprint;
 
 /**
  * MySQL Schema Builder
@@ -39,29 +40,41 @@ class MySQLSchemaBuilder implements SchemaBuilderInterface
     }
 
     /**
-     * Create a new table (basic implementation)
+     * Create a new table using Blueprint
      */
     public function createTable(string $table, callable $callback): void
     {
-        // For now, this is a basic implementation
-        // In a full implementation, you'd have a table blueprint class
-        // that the callback would configure
+        $blueprint = new Blueprint($table);
+        $callback($blueprint);
         
-        $sql = "CREATE TABLE `{$table}` (
-            `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-            `created_at` timestamp NULL DEFAULT NULL,
-            `updated_at` timestamp NULL DEFAULT NULL,
-            PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+        $sql = $blueprint->toSql();
         
         $this->driver->getConnection()->exec($sql);
         $this->driver->recordQueryExecution();
     }
 
     /**
+     * Create a new table (alias for createTable)
+     */
+    public function create(string $table, callable $callback): void
+    {
+        $this->createTable($table, $callback);
+    }
+
+    /**
      * Drop a table
      */
     public function dropTable(string $table): void
+    {
+        $sql = "DROP TABLE `{$table}`";
+        $this->driver->getConnection()->exec($sql);
+        $this->driver->recordQueryExecution();
+    }
+
+    /**
+     * Drop a table if it exists
+     */
+    public function dropIfExists(string $table): void
     {
         $sql = "DROP TABLE IF EXISTS `{$table}`";
         $this->driver->getConnection()->exec($sql);

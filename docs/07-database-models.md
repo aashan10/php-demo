@@ -7,6 +7,7 @@ The Elementary framework provides a powerful and scalable database layer with co
 - **Connection Pooling**: High-performance connection management for scalability
 - **Container-Free Architecture**: Clean models without dependency injection
 - **Active Record Pattern**: Laravel-style model methods for intuitive database interaction
+- **Database Migrations**: Version control for your database schema changes ([See Migration Guide](08-database-migrations.md))
 - **Database Sessions**: Session storage in database for multi-server deployments
 - **Query Builder**: Fluent, chainable query interface with advanced features
 - **Production Ready**: Horizontal scaling, Docker support, enterprise-grade architecture
@@ -656,6 +657,56 @@ if ($config->get('database.performance.log_queries')) {
 $slowThreshold = $config->get('database.performance.slow_query_threshold', 1000);
 ```
 
+## Database Migrations
+
+Elementary includes a comprehensive migration system for version controlling your database schema changes. Migrations allow you to modify your database structure in a structured and collaborative way.
+
+### Quick Start
+
+```bash
+# Create a migration
+php elementary make:migration create_users_table
+
+# Create a model with migration
+php elementary make:model Product -m
+
+# Run migrations
+php elementary migrate
+
+# Check status
+php elementary migrate:status
+
+# Rollback
+php elementary migrate:rollback
+```
+
+### Example Migration
+
+```php
+use Elementary\Database\Migration\Migration;
+
+class Migration_2025_09_30_172032_CreateUsersTable extends Migration
+{
+    public function up(): void
+    {
+        $this->schema->create('users', function($table) {
+            $table->id();
+            $table->string('email')->unique();
+            $table->string('password');
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
+    }
+    
+    public function down(): void
+    {
+        $this->schema->dropIfExists('users');
+    }
+}
+```
+
+**📖 [Complete Migration Guide](08-database-migrations.md)** - Learn about schema building, rollbacks, best practices, and advanced features.
+
 ## Getting Started
 
 Elementary's database layer is designed for simplicity and performance:
@@ -663,6 +714,7 @@ Elementary's database layer is designed for simplicity and performance:
 1. **Configure** your database connection in `config/database.php`
 2. **Initialize** the DatabaseManager in your bootstrap
 3. **Create** model classes extending `Elementary\Database\Model`
-4. **Use** intuitive Active Record patterns for database operations
+4. **Create** database migrations for schema changes
+5. **Use** intuitive Active Record patterns for database operations
 
 The architecture provides enterprise-grade features like connection pooling while maintaining clean, readable code throughout your application.

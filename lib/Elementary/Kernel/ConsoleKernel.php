@@ -8,6 +8,10 @@ use Elementary\Config\ConfigBag;
 use Elementary\Console\Commands\SessionCleanCommand;
 use Elementary\Console\Commands\TemplateCompileCommand;
 use Elementary\Database\Connection;
+use Elementary\Database\Console\Commands\MakeMigrationCommand;
+use Elementary\Database\Console\Commands\MigrateCommand;
+use Elementary\Database\Console\Commands\MigrateRollbackCommand;
+use Elementary\Database\Console\Commands\MigrateStatusCommand;
 use Elementary\DI\Container;
 use Elementary\Http\Response;
 use Elementary\Maker\Commands\MakeCommandCommand;
@@ -37,6 +41,10 @@ class ConsoleKernel implements KernelInterface
             $this->getCommandName(MakeModelCommand::class)       => MakeModelCommand::class,
             $this->getCommandName(MakeMiddlewareCommand::class)  => MakeMiddlewareCommand::class,
             $this->getCommandName(MakeCommandCommand::class)     => MakeCommandCommand::class,
+            $this->getCommandName(MigrateCommand::class)         => MigrateCommand::class,
+            $this->getCommandName(MigrateRollbackCommand::class) => MigrateRollbackCommand::class,
+            $this->getCommandName(MigrateStatusCommand::class)   => MigrateStatusCommand::class,
+            $this->getCommandName(MakeMigrationCommand::class)   => MakeMigrationCommand::class,
         ];
         // Constructor is empty, bootstrap will set up the container
     }

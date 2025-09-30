@@ -25,7 +25,7 @@ return [
     | to immediately expire on browser close, set that option.
     |
     */
-    'lifetime' => 120, // in minutes
+    'lifetime' => 720, // in minutes (12 hours)
 
     /*
     |--------------------------------------------------------------------------
@@ -36,7 +36,7 @@ return [
     | valid. If this expires, a new token will be generated for the user.
     |
     */
-    'csrf_lifetime' => 120, // in minutes (2 hours)
+    'csrf_lifetime' => 720, // in minutes (12 hours)
 
     'expire_on_close' => false,
 

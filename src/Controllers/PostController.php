@@ -18,7 +18,7 @@ class PostController extends Controller
      */
     public function index(): Response
     {
-        $posts = Post::with('user')->orderBy('created_at', 'DESC')->get();
+        $posts = Post::all();
 
         return $this->render('posts/index', ['posts' => $posts]);
     }
@@ -29,7 +29,7 @@ class PostController extends Controller
     public function show(Request $request): Response
     {
         $id = $request->attributes->get('id');
-        $post = Post::with('user')->find((int)$id);
+        $post = Post::find((int)$id);
 
         if (!$post) {
             return $this->render('errors/404', []);
@@ -59,16 +59,21 @@ class PostController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->render('posts/create', [
+            return $this->render('admin/posts/create', [
                 'errors' => $validator->errors(),
                 'old' => $data,
             ]);
         }
 
+        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $data['title']), '-'));
+        
         Post::create([
             'title' => $data['title'],
             'content' => $data['content'],
-            'user_id' => $this->request->user->getId(),
+            'excerpt' => substr($data['content'], 0, 200),
+            'slug' => $slug,
+            'status' => 'published',
+            'user_id' => $request->user->id,
         ]);
 
         $this->addFlash('success', 'Post created successfully!');

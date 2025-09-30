@@ -246,6 +246,25 @@ final class DatabaseManager
     }
 
     /**
+     * Get schema builder for the default connection
+     */
+    public function getSchemaBuilder(string $connectionName = null): \Elementary\Database\Contracts\SchemaBuilderInterface
+    {
+        $connection = $this->connection($connectionName);
+        
+        // Return appropriate schema builder based on driver type
+        if ($connection instanceof \Elementary\Database\Drivers\MySQLDriver) {
+            return new \Elementary\Database\Schema\MySQLSchemaBuilder($connection);
+        }
+        
+        if ($connection instanceof \Elementary\Database\Drivers\RedisDriver) {
+            return new \Elementary\Database\Schema\RedisSchemaBuilder($connection);
+        }
+        
+        throw new \RuntimeException("Schema builder not available for this driver type.");
+    }
+
+    /**
      * Reset the singleton instance (for testing)
      */
     public static function reset(): void

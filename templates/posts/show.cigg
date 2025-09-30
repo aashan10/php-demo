@@ -14,7 +14,7 @@
         <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">{{ $post->title }}</h1>
         
         <div class="flex items-center text-md text-gray-500 mb-8">
-            <p>By: {{ $post->user->first_name ?? 'Unknown' }} {{ $post->user->last_name ?? '' }}</p>
+            <p>By: Admin</p>
             <span class="mx-2">&bull;</span>
             <p>Posted on {{ date('F j, Y, g:i a', strtotime($post->created_at)) }}</p>
         </div>

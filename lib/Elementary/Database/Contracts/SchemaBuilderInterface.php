@@ -24,9 +24,19 @@ interface SchemaBuilderInterface
     public function createTable(string $table, callable $callback): void;
 
     /**
+     * Create a new table/collection (alias for createTable)
+     */
+    public function create(string $table, callable $callback): void;
+
+    /**
      * Drop a table/collection
      */
     public function dropTable(string $table): void;
+
+    /**
+     * Drop a table/collection if it exists
+     */
+    public function dropIfExists(string $table): void;
 
     /**
      * Rename a table/collection
