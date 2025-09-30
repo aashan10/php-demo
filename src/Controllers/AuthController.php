@@ -129,8 +129,8 @@ class AuthController extends Controller
         // Clear session data first
         $session->destroy();
         
-        // Regenerate session ID to ensure clean logout
-        $session->regenerateId(true);
+        // TODO: Re-enable session regeneration after fixing compatibility with custom session driver
+        // $session->regenerateId(true);
         
         $response = $this->redirectToRoute('home');
         

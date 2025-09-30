@@ -30,6 +30,12 @@ class StartSession implements MiddlewareInterface
         session_set_save_handler($driver, true);
 
         $lifetime = $this->config->get('session.lifetime', 120) * 60;
+        
+        // Configure PHP session settings to match our configuration
+        ini_set('session.gc_maxlifetime', $lifetime);
+        ini_set('session.cookie_lifetime', $lifetime);
+        ini_set('session.gc_probability', 1);
+        ini_set('session.gc_divisor', 100);
         $path = '/';
         $domain = null;
         $secure = $this->config->get('session.secure', false); // Use HTTPS in production
