@@ -44,7 +44,11 @@ class AuthController extends Controller
             ]);
         }
 
+        // Set user data in session
         $session->set('user_id', $user->id);
+        
+        // TODO: Re-enable session regeneration after fixing compatibility with custom session driver
+        // $session->regenerateId(true);
 
         $redirection = $session->get('redirection_url_after_login', null);
 
@@ -111,16 +115,26 @@ class AuthController extends Controller
         
         $newUser = User::query()->where('email', '=', $data['email'])->first();
 
+        // Set user data in session
         $session->set('user_id', $newUser->id);
+        
+        // TODO: Re-enable session regeneration after fixing compatibility with custom session driver
+        // $session->regenerateId(true);
 
         return $this->redirectToRoute('home');
     }
 
     public function logout(SessionBag $session): Response
     {
+        // Clear session data first
         $session->destroy();
         
+        // Regenerate session ID to ensure clean logout
+        $session->regenerateId(true);
+        
         $response = $this->redirectToRoute('home');
+        
+        // Clear remember me cookie
         $response->cookies->set('elementary_auth', '', time() - 3600);
 
         return $response;

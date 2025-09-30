@@ -11,7 +11,9 @@ RUN docker-php-ext-install pdo_mysql mysqli opcache pcntl
 RUN apk add --no-cache linux-headers \
     && apk add --update --no-cache --virtual .build-dependencies $PHPIZE_DEPS\
     && pecl install xdebug \
+    && pecl install redis \
     && docker-php-ext-enable xdebug \
+    && docker-php-ext-enable redis \
     && pecl clear-cache \
     && apk del .build-dependencies
 

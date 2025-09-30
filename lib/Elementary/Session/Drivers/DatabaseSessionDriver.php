@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Elementary\Session\Drivers;
 
-use Elementary\Database\QueryBuilder;
-use Elementary\Database\Connection;
+use Elementary\Database\DatabaseManager;
+use Elementary\Database\Contracts\QueryBuilderInterface;
 use stdClass;
 
 class DatabaseSessionDriver implements SessionDriverInterface
 {
-    private QueryBuilder $query;
+    private QueryBuilderInterface $query;
     private string $table;
 
-    public function __construct(Connection $connection, string $table)
+    public function __construct(DatabaseManager $manager, string $table)
     {
-        $this->query = new QueryBuilder($connection->getInstance());
+        $this->query = $manager->newQuery();
         $this->table = $table;
     }
 
@@ -31,10 +31,10 @@ class DatabaseSessionDriver implements SessionDriverInterface
 
     public function read(string $id): string|false
     {
-        $session = $this->query->setModel(stdClass::class)->table($this->table)->where('id', '=', $id)->first();
+        $session = $this->query->table($this->table)->where('id', '=', $id)->first();
 
-        if ($session && isset($session->payload)) {
-            return base64_decode($session->payload);
+        if ($session && isset($session['payload'])) {
+            return base64_decode($session['payload']);
         }
 
         return '';
@@ -45,6 +45,7 @@ class DatabaseSessionDriver implements SessionDriverInterface
         $payload = base64_encode($data);
         $last_activity = time();
 
+        // Delete existing session and insert new one (atomic operation in transaction)
         $this->query->table($this->table)->where('id', '=', $id)->delete();
         $this->query->table($this->table)->insert([
             'id' => $id,

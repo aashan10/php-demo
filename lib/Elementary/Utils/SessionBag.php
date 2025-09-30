@@ -65,6 +65,14 @@ class SessionBag
     }
 
     /**
+     * Regenerates the session ID to prevent session fixation attacks.
+     */
+    public function regenerateId(bool $deleteOldSession = true): bool
+    {
+        return session_regenerate_id($deleteOldSession);
+    }
+
+    /**
      * Destroys the entire session.
      */
     public function destroy(): bool

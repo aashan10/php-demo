@@ -32,14 +32,22 @@ class StartSession implements MiddlewareInterface
         $lifetime = $this->config->get('session.lifetime', 120) * 60;
         $path = '/';
         $domain = null;
-        $secure = false;
+        $secure = $this->config->get('session.secure', false); // Use HTTPS in production
         $httpOnly = true;
-        session_set_cookie_params($lifetime, $path, $domain, $secure, $httpOnly);
+        $sameSite = 'Lax'; // CSRF protection
+        session_set_cookie_params([
+            'lifetime' => $lifetime,
+            'path' => $path,
+            'domain' => $domain,
+            'secure' => $secure,
+            'httponly' => $httpOnly,
+            'samesite' => $sameSite
+        ]);
 
         $sessionName = session_name();
         if ($request->cookies->has($sessionName)) {
             $sessionId = $request->cookies->get($sessionName);
-            if ($sessionId && ctype_alnum($sessionId)) {
+            if ($sessionId && preg_match('/^[a-zA-Z0-9,-]+$/', $sessionId)) {
                 session_id($sessionId);
             }
         }
@@ -48,13 +56,9 @@ class StartSession implements MiddlewareInterface
 
         $response = $next($request);
 
-        $currentSessionId = session_id();
-        if (session_status() === PHP_SESSION_ACTIVE && $currentSessionId) {
-            $originalSessionId = $request->cookies->get($sessionName);
-            if ($originalSessionId !== $currentSessionId) {
-                 $response->cookies->set($sessionName, $currentSessionId);
-            }
-        }
+        // Let PHP handle session cookie management automatically
+        // No need to manually set session cookies as PHP does this automatically
+        // when session_start() or session_regenerate_id() is called
 
         return $response;
     }

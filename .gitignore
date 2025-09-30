@@ -1,6 +1,7 @@
 /vendor
 .DS_Store
-/cache/sessions/*
-/cache/templates/*
+/cache/*/*
 /public/build
+/storage/coverage/* 
+/storage/logs/*
 /node_modules

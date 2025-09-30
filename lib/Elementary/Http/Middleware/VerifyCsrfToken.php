@@ -29,8 +29,12 @@ class VerifyCsrfToken implements MiddlewareInterface
             return $next($request);
         }
 
-        // Return a "419 Page Expired" response
-        return new Response(419, 'Page Expired. Please refresh and try again.');
+        // Return a "419 Page Expired" response with better user experience
+        return new Response(419, 
+            '<h1>Session Expired</h1>' .
+            '<p>For your security, this form has expired. Please <a href="javascript:window.location.reload()">refresh the page</a> and try again.</p>' .
+            '<script>setTimeout(function(){ window.location.reload(); }, 3000);</script>'
+        );
     }
 
     private function isReading(Request $request): bool

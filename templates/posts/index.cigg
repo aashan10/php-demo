@@ -1,0 +1,41 @@
+@extends('layouts/app')
+
+@section('title')
+    Blog Posts
+@endsection
+
+@section('body')
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center mb-12">
+        <h1 class="text-5xl font-bold text-gray-900 tracking-tight">The Elementary Blog</h1>
+        <p class="mt-4 text-xl text-gray-600">News, updates, and tutorials from the team.</p>
+    </div>
+
+    <div class="space-y-8">
+        @if (empty($posts))
+            <div class="text-center py-16 bg-white rounded-lg shadow-md">
+                <p class="text-gray-600 text-lg">No posts have been created yet. Check back soon!</p>
+            </div>
+        @else
+            @foreach ($posts as $post)
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
+                    <div class="p-8">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-3">
+                            <a href="/posts/{{ $post->id }}" class="hover:text-blue-600 transition-colors">{{ $post->title }}</a>
+                        </h2>
+                        <div class="flex items-center text-sm text-gray-500 mb-4">
+                            <p>By: {{ $post->user->first_name ?? 'Unknown' }} {{ $post->user->last_name ?? '' }}</p>
+                            <span class="mx-2">&bull;</span>
+                            <p>Posted on {{ date('F j, Y', strtotime($post->created_at)) }}</p>
+                        </div>
+                        <p class="text-gray-700 leading-relaxed mb-6">
+                            {{ substr($post->content, 0, 250) }}...
+                        </p>
+                        <a href="/posts/{{ $post->id }}" class="font-semibold text-blue-600 hover:text-blue-800 transition-colors">Read More &rarr;</a>
+                    </div>
+                </div>
+            @endforeach
+        @endif
+    </div>
+</div>
+@endsection

@@ -36,9 +36,21 @@ return [
     | valid. If this expires, a new token will be generated for the user.
     |
     */
-    'csrf_lifetime' => 10, // in minutes
+    'csrf_lifetime' => 120, // in minutes (2 hours)
 
     'expire_on_close' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Session Cookie Security
+    |--------------------------------------------------------------------------
+    |
+    | Configure session cookie security settings. Set 'secure' to true
+    | when using HTTPS in production for enhanced security.
+    |
+    */
+    'secure' => false, // Set to true for HTTPS in production
+    'same_site' => 'Lax', // CSRF protection: 'Strict', 'Lax', or 'None'
 
     /*
     |--------------------------------------------------------------------------

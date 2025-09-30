@@ -2,8 +2,8 @@
 
 use Elementary\Config\ConfigBag;
 use Elementary\Database\Connection;
+use Elementary\Database\DatabaseManager;
 use Elementary\DI\Container;
-use Elementary\Database\Model;
 use App\Repositories\UserRepository;
 use App\Repositories\UserRepositoryInterface;
 use Elementary\Log\Drivers\FileLogger;
@@ -16,7 +16,6 @@ use Elementary\Template\Cigg\Parser\Parser;
 use Elementary\Template\Cigg\Directives\DirectiveRegistry;
 use Elementary\Template\Cigg\Compiler\Compiler;
 use Elementary\Validation\Validator;
-use Elementary\Database\QueryBuilder;
 use Elementary\Utils\EncryptionService;
 use Elementary\Session\SessionManager;
 use Elementary\Spark\SparkComponentManager;
@@ -40,6 +39,11 @@ Validator::macro('validateName', function ($data) {
 $config = new ConfigBag(BASE_PATH . '/config');
 $container->bind(ConfigBag::class, fn() => $config);
 
+// =====================================================
+// Initialize Database Manager (No Container Dependencies!)
+// =====================================================
+DatabaseManager::initialize($config);
+
 // Bind SessionBag
 $session = new SessionBag();
 $container->bind(SessionBag::class, fn() => $session);
@@ -51,14 +55,13 @@ $container->bind(FlashBag::class, fn() => $flashBag);
 // Bind Connection (using a factory to ensure ConfigBag is available)
 $container->bind(Connection::class, fn(Container $c) => new Connection($c->get(ConfigBag::class)));
 
-// Bind Query Builder
-$container->bind(QueryBuilder::class, fn(Container $c) => new QueryBuilder($c->get(Connection::class)->getInstance()));
+// Legacy QueryBuilder removed - now using driver-specific query builders via DatabaseManager
 
 // Bind EncryptionService
 $container->bind(EncryptionService::class, fn(Container $c) => new EncryptionService($c->get(ConfigBag::class)));
 
 // Bind SessionManager
-$container->bind(SessionManager::class, fn(Container $c) => new SessionManager($c->get(ConfigBag::class), $c->get(Connection::class)));
+$container->bind(SessionManager::class, fn(Container $c) => new SessionManager($c->get(ConfigBag::class), DatabaseManager::getInstance()));
 
 
 $container->bind(LoggerInterface::class, function (Container $c): LoggerInterface {
@@ -115,7 +118,10 @@ $container->bind(DirectiveRegistry::class, function(Container $c) {
 
 
 
-Model::setContainer($container);
+// =====================================================
+// Models now use DatabaseManager - no container needed!
+// =====================================================
+// Model::setContainer($container); // <- REMOVED! 🎉
 
 // Bind SparkComponentManager
 $container->bind(SparkComponentManager::class, function(Container $c) {

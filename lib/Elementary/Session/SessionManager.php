@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Elementary\Session;
 
 use Elementary\Config\ConfigBag;
-use Elementary\Database\Connection;
+use Elementary\Database\DatabaseManager;
 use Elementary\Session\Drivers\DatabaseSessionDriver;
 use Elementary\Session\Drivers\FileSessionDriver;
 use Elementary\Session\Drivers\SessionDriverInterface;
@@ -13,10 +13,10 @@ use Elementary\Session\Drivers\SessionDriverInterface;
 class SessionManager
 {
     private ConfigBag $config;
-    private Connection $db;
+    private DatabaseManager $db;
     private ?SessionDriverInterface $driver = null;
 
-    public function __construct(ConfigBag $config, Connection $db)
+    public function __construct(ConfigBag $config, DatabaseManager $db)
     {
         $this->config = $config;
         $this->db = $db;

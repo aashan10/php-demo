@@ -12,7 +12,10 @@ use RuntimeException;
 
 class EncryptCookies implements MiddlewareInterface
 {
-    private array $except = [];
+    private array $except = [
+        'PHPSESSID',        // Session ID should not be encrypted
+        'elementary_auth',  // Remember me token should not be encrypted
+    ];
 
     public function __construct(private EncryptionService $encrypter)
     {

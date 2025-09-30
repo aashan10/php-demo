@@ -37,6 +37,17 @@ services:
     networks:
       - app-network
 
+  redis:
+    image: redis:7-alpine
+    container_name: php_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+    command: redis-server --appendonly yes # Enable persistence
+
   cli:
     build:
       context: .
@@ -63,6 +74,7 @@ services:
 
 volumes:
   mysql_data: # Define the named volume for MySQL data
+  redis_data: # Define the named volume for Redis data
 
 networks:
   app-network:
