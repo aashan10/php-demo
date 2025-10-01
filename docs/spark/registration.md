@@ -115,15 +115,18 @@ In your bootstrap process (typically `bootstrap.php`):
 <?php
 // bootstrap.php
 
-use Elementary\Spark\SparkComponentRegistry;
+use Elementary\Spark\SparkManager;
+
+// Get SparkManager instance from container
+$sparkManager = $container->get(SparkManager::class);
 
 // Load Spark configuration
 $sparkConfig = require BASE_PATH . '/config/spark.php';
 
-// Register all components
+// Register all components with the unified manager
 if (isset($sparkConfig['components'])) {
     foreach ($sparkConfig['components'] as $name => $class) {
-        SparkComponentRegistry::register($name, $class);
+        $sparkManager->registerComponent($name, $class);
     }
 }
 ```

@@ -85,16 +85,16 @@ class CounterComponent extends SparkComponent
     </div>
     
     <div class="flex space-x-2">
-        <button wire:click="decrement" 
+        <button spark:click="decrement" 
                 class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
                 @if($count <= 0) disabled @endif>
             -
         </button>
-        <button wire:click="increment" 
+        <button spark:click="increment" 
                 class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">
             +
         </button>
-        <button wire:click="reset" 
+        <button spark:click="reset" 
                 class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded">
             Reset
         </button>
@@ -144,11 +144,11 @@ class HelloWorldComponent extends SparkComponent
     
     <div class="flex space-x-2">
         <input type="text" 
-               wire:model="name" 
-               wire:blur="updateGreeting"
+               spark:model="name" 
+               spark:blur="updateGreeting"
                placeholder="Enter your name"
                class="flex-1 px-3 py-2 border rounded">
-        <button wire:click="updateGreeting" 
+        <button spark:click="updateGreeting" 
                 class="bg-blue-500 text-white px-4 py-2 rounded">
             Greet
         </button>
@@ -240,17 +240,17 @@ class ContactFormComponent extends SparkComponent
     @if($submitted)
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
             <strong>Thank you!</strong> Your message has been sent successfully.
-            <button wire:click="reset" class="float-right text-sm underline">
+            <button spark:click="reset" class="float-right text-sm underline">
                 Send another message
             </button>
         </div>
     @else
-        <form wire:submit="submit" class="space-y-4">
+        <form spark:submit="submit" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
                     <input type="text" 
-                           wire:model="name" 
+                           spark:model="name" 
                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                            placeholder="Your full name">
                 </div>
@@ -258,7 +258,7 @@ class ContactFormComponent extends SparkComponent
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
                     <input type="email" 
-                           wire:model="email" 
+                           spark:model="email" 
                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                            placeholder="your@email.com">
                 </div>
@@ -267,14 +267,14 @@ class ContactFormComponent extends SparkComponent
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
                 <input type="text" 
-                       wire:model="subject" 
+                       spark:model="subject" 
                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                        placeholder="Message subject">
             </div>
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Message *</label>
-                <textarea wire:model="message" 
+                <textarea spark:model="message" 
                           rows="5"
                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                           placeholder="Your message..."></textarea>
@@ -573,11 +573,11 @@ class UserListComponent extends SparkComponent
     <div class="p-4 border-b">
         <div class="flex space-x-4">
             <input type="text" 
-                   wire:model="searchTerm" 
-                   wire:blur="search"
+                   spark:model="searchTerm" 
+                   spark:blur="search"
                    placeholder="Search users..."
                    class="flex-1 px-3 py-2 border rounded-md">
-            <button wire:click="search" 
+            <button spark:click="search" 
                     class="bg-blue-500 text-white px-4 py-2 rounded-md">
                 Search
             </button>
@@ -597,7 +597,7 @@ class UserListComponent extends SparkComponent
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-left">
-                            <button wire:click="sort('name')" class="flex items-center space-x-1">
+                            <button spark:click="sort('name')" class="flex items-center space-x-1">
                                 <span>Name</span>
                                 @if($sortBy === 'name')
                                     <span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
@@ -605,7 +605,7 @@ class UserListComponent extends SparkComponent
                             </button>
                         </th>
                         <th class="px-4 py-3 text-left">
-                            <button wire:click="sort('email')" class="flex items-center space-x-1">
+                            <button spark:click="sort('email')" class="flex items-center space-x-1">
                                 <span>Email</span>
                                 @if($sortBy === 'email')
                                     <span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
@@ -613,7 +613,7 @@ class UserListComponent extends SparkComponent
                             </button>
                         </th>
                         <th class="px-4 py-3 text-left">
-                            <button wire:click="sort('created_at')" class="flex items-center space-x-1">
+                            <button spark:click="sort('created_at')" class="flex items-center space-x-1">
                                 <span>Created</span>
                                 @if($sortBy === 'created_at')
                                     <span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
@@ -630,7 +630,7 @@ class UserListComponent extends SparkComponent
                             <td class="px-4 py-3">{{ $user['email'] }}</td>
                             <td class="px-4 py-3">{{ $user['created_at'] }}</td>
                             <td class="px-4 py-3">
-                                <button wire:click="deleteUser({{ $user['id'] }})" 
+                                <button spark:click="deleteUser({{ $user['id'] }})" 
                                         class="text-red-600 hover:text-red-800">
                                     Delete
                                 </button>
@@ -652,21 +652,21 @@ class UserListComponent extends SparkComponent
                 
                 <div class="flex space-x-1">
                     @if($currentPage > 1)
-                        <button wire:click="goToPage({{ $currentPage - 1 }})" 
+                        <button spark:click="goToPage({{ $currentPage - 1 }})" 
                                 class="px-3 py-2 text-sm border rounded">
                             Previous
                         </button>
                     @endif
                     
                     @for($i = 1; $i <= $this->getTotalPages(); $i++)
-                        <button wire:click="goToPage({{ $i }})" 
+                        <button spark:click="goToPage({{ $i }})" 
                                 class="px-3 py-2 text-sm border rounded {{ $i === $currentPage ? 'bg-blue-500 text-white' : '' }}">
                             {{ $i }}
                         </button>
                     @endfor
                     
                     @if($currentPage < $this->getTotalPages())
-                        <button wire:click="goToPage({{ $currentPage + 1 }})" 
+                        <button spark:click="goToPage({{ $currentPage + 1 }})" 
                                 class="px-3 py-2 text-sm border rounded">
                             Next
                         </button>
@@ -802,10 +802,10 @@ class TodoListComponent extends SparkComponent
         <h1 class="text-2xl font-bold text-center mb-6">Todo List</h1>
         
         <!-- Add New Todo -->
-        <form wire:submit="addTodo" class="mb-6">
+        <form spark:submit="addTodo" class="mb-6">
             <div class="flex space-x-2">
                 <input type="text" 
-                       wire:model="newTodo" 
+                       spark:model="newTodo" 
                        placeholder="What needs to be done?"
                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <button type="submit" 
@@ -817,15 +817,15 @@ class TodoListComponent extends SparkComponent
         
         <!-- Filter Buttons -->
         <div class="flex space-x-1 mb-4">
-            <button wire:click="setFilter('all')" 
+            <button spark:click="setFilter('all')" 
                     class="px-3 py-1 text-sm rounded {{ $filter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200' }}">
                 All ({{ count($todos) }})
             </button>
-            <button wire:click="setFilter('active')" 
+            <button spark:click="setFilter('active')" 
                     class="px-3 py-1 text-sm rounded {{ $filter === 'active' ? 'bg-blue-500 text-white' : 'bg-gray-200' }}">
                 Active ({{ $this->getActiveCount() }})
             </button>
-            <button wire:click="setFilter('completed')" 
+            <button spark:click="setFilter('completed')" 
                     class="px-3 py-1 text-sm rounded {{ $filter === 'completed' ? 'bg-blue-500 text-white' : 'bg-gray-200' }}">
                 Completed ({{ $this->getCompletedCount() }})
             </button>
@@ -836,13 +836,13 @@ class TodoListComponent extends SparkComponent
             @foreach($this->getFilteredTodos() as $todo)
                 <div class="flex items-center space-x-3 p-3 border rounded-md {{ $todo['completed'] ? 'bg-gray-50' : 'bg-white' }}">
                     <input type="checkbox" 
-                           wire:click="toggleTodo('{{ $todo['id'] }}')"
+                           spark:click="toggleTodo('{{ $todo['id'] }}')"
                            {{ $todo['completed'] ? 'checked' : '' }}
                            class="w-4 h-4">
                     <span class="flex-1 {{ $todo['completed'] ? 'line-through text-gray-500' : '' }}">
                         {{ $todo['text'] }}
                     </span>
-                    <button wire:click="removeTodo('{{ $todo['id'] }}')" 
+                    <button spark:click="removeTodo('{{ $todo['id'] }}')" 
                             class="text-red-500 hover:text-red-700">
                         ×
                     </button>
@@ -868,7 +868,7 @@ class TodoListComponent extends SparkComponent
                 <span>{{ $this->getActiveCount() }} item(s) left</span>
                 
                 @if($this->getCompletedCount() > 0)
-                    <button wire:click="clearCompleted" 
+                    <button spark:click="clearCompleted" 
                             class="text-red-500 hover:text-red-700">
                         Clear completed
                     </button>

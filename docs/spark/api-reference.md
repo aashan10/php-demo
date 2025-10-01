@@ -9,7 +9,7 @@ Complete API reference for the Spark reactive component system.
 3. [SparkComponentRegistry Class](#sparkcomponentregistry-class)
 4. [Middleware Classes](#middleware-classes)
 5. [JavaScript API](#javascript-api)
-6. [Wire Directives](#wire-directives)
+6. [Spark Directives](#spark-directives)
 7. [Template Functions](#template-functions)
 8. [Configuration Options](#configuration-options)
 
@@ -272,7 +272,7 @@ public function toHtml(): string
 
 Renders the component with Spark wrapper attributes.
 
-**Returns:** `string` - Complete HTML with wire attributes
+**Returns:** `string` - Complete HTML with spark attributes
 
 ### Security
 
@@ -666,26 +666,26 @@ Calls a server-side method.
 - `method` - Method name
 - `params` - Method parameters
 
-## Wire Directives
+## Spark Directives
 
-### wire:click
+### spark:click
 
 Handles click events on elements.
 
 ```html
-<button wire:click="methodName">Click Me</button>
-<button wire:click="methodWithParams('param1', 123)">With Params</button>
+<button spark:click="methodName">Click Me</button>
+<button spark:click="methodWithParams('param1', 123)">With Params</button>
 ```
 
-### wire:model
+### spark:model
 
 Two-way data binding for form inputs.
 
 ```html
-<input type="text" wire:model="propertyName">
-<input type="number" wire:model="count">
-<input type="checkbox" wire:model="isActive">
-<select wire:model="selectedOption">
+<input type="text" spark:model="propertyName">
+<input type="number" spark:model="count">
+<input type="checkbox" spark:model="isActive">
+<select spark:model="selectedOption">
     <option value="1">Option 1</option>
     <option value="2">Option 2</option>
 </select>
@@ -696,23 +696,47 @@ Two-way data binding for form inputs.
 - Other inputs use `input` event
 - Values are automatically type-converted
 
-### wire:submit
+### spark:submit
 
 Handles form submission.
 
 ```html
-<form wire:submit="submitForm">
-    <input type="text" wire:model="name">
+<form spark:submit="submitForm">
+    <input type="text" spark:model="name">
     <button type="submit">Submit</button>
 </form>
 ```
 
-### Other Wire Events
+### spark:on-* Event Directives
+
+New flexible event handling system that supports any DOM event.
 
 ```html
-<input wire:blur="validateField">
-<input wire:change="handleChange">
-<input wire:keydown="handleKeypress">
+<!-- Re-render component on blur -->
+<input spark:on-blur="render" type="text" placeholder="Re-renders on blur">
+
+<!-- Call method on focus -->
+<input spark:on-focus="validateField" type="email">
+
+<!-- Call method on any event -->
+<button spark:on-mouseenter="onHover">Hover Me</button>
+<input spark:on-keydown="handleKeypress" type="text">
+<select spark:on-change="updateSelection">...</select>
+```
+
+**Supported Actions:**
+- `"render"` - Triggers component re-render via server sync
+- `"methodName"` - Calls the specified component method
+
+**Supported Events:**
+- Any valid DOM event: `blur`, `focus`, `click`, `change`, `keydown`, `keyup`, `mouseenter`, `mouseleave`, etc.
+
+### Other Spark Events
+
+```html
+<input spark:blur="validateField">
+<input spark:change="handleChange">
+<input spark:keydown="handleKeypress">
 ```
 
 ## Template Functions
@@ -907,7 +931,7 @@ class CounterComponent extends SparkComponent
 // Template
 <div>
     <p>Count: {{ $count }}</p>
-    <button wire:click="increment">+</button>
+    <button spark:click="increment">+</button>
 </div>
 
 // Usage

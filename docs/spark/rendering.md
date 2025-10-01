@@ -182,7 +182,7 @@ class PaginationComponent extends SparkComponent
 4. **Mount Execution**: Call `mount()` method
 5. **Template Compilation**: Compile Cigg template
 6. **Rendering**: Execute template with component data
-7. **HTML Generation**: Generate final HTML with wire attributes
+7. **HTML Generation**: Generate final HTML with spark attributes
 8. **Client Hydration**: JavaScript takes over on client
 
 ### Server-Side Rendering Process
@@ -248,9 +248,9 @@ After server-side rendering, JavaScript hydrates the component:
 // Component hydration process
 class SparkComponent {
     constructor(element: ComponentElement) {
-        // 1. Parse wire:data attribute
-        const wireData = element.getAttribute('wire:data');
-        const componentData = JSON.parse(atob(wireData));
+        // 1. Parse spark:data attribute
+        const sparkData = element.getAttribute('spark:data');
+        const componentData = JSON.parse(atob(sparkData));
         
         // 2. Initialize component state
         this.data = componentData.data;
@@ -304,11 +304,11 @@ Template File: templates/spark/userprofile.cigg
     
     <!-- Interactive elements -->
     <div class="actions">
-        <button wire:click="toggleFollow">
+        <button spark:click="toggleFollow">
             {{ $isFollowing ? 'Unfollow' : 'Follow' }}
         </button>
         
-        <button wire:click="sendMessage">Send Message</button>
+        <button spark:click="sendMessage">Send Message</button>
     </div>
     
     <!-- Component state (not visible to user) -->
@@ -373,7 +373,7 @@ Components can extend other templates:
 
 @section('content')
     <p>{{ $email }}</p>
-    <button wire:click="viewProfile">View Profile</button>
+    <button spark:click="viewProfile">View Profile</button>
 @endsection
 ```
 

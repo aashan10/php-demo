@@ -157,7 +157,7 @@ Create the template:
 <div class="counter">
     <h3>{{ $message }}</h3>
     <p>Current count: <strong>{{ $count }}</strong></p>
-    <button wire:click="increment">Increment</button>
+    <button spark:click="increment">Increment</button>
 </div>
 ```
 

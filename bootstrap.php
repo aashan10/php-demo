@@ -18,7 +18,7 @@ use Elementary\Template\Cigg\Compiler\Compiler;
 use Elementary\Validation\Validator;
 use Elementary\Utils\EncryptionService;
 use Elementary\Session\SessionManager;
-use Elementary\Spark\SparkComponentManager;
+use Elementary\Spark\SparkManager;
 use Psr\Log\LoggerInterface;
 
 Validator::macro('validateName', function ($data) {
@@ -123,13 +123,14 @@ $container->bind(DirectiveRegistry::class, function(Container $c) {
 // =====================================================
 // Model::setContainer($container); // <- REMOVED! 🎉
 
-// Bind SparkComponentManager
-$container->bind(SparkComponentManager::class, function(Container $c) {
-    return new SparkComponentManager($c);
+// Bind SparkManager
+$container->bind(SparkManager::class, function(Container $c) {
+    return new SparkManager($c);
 });
 
 // Register Live Components
 $sparkConfig = require BASE_PATH . '/config/spark.php';
+$sparkManager = $container->get(SparkManager::class);
 foreach ($sparkConfig['components'] as $name => $className) {
-    \Elementary\Spark\SparkComponentRegistry::register($name, $className);
+    $sparkManager->registerComponent($name, $className);
 }

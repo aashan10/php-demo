@@ -243,7 +243,7 @@ abstract class SparkComponent
      */
     protected function emit(string $event, mixed $data = null): void
     {
-        // This will be handled by the SparkComponentManager
+        // This will be handled by the SparkManager
         SparkManager::getInstance()->addEvent($event, $data);
     }
 
@@ -303,8 +303,8 @@ abstract class SparkComponent
         $state = $this->getState();
         
         $attributes = [
-            'wire:id' => $this->componentId,
-            'wire:data' => base64_encode(json_encode($state))
+            'spark:id' => $this->componentId,
+            'spark:data' => base64_encode(json_encode($state))
         ];
         
         $attributeString = '';

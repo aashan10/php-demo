@@ -15,6 +15,7 @@ class SparkManager
     private static ?self $instance = null;
     private array $components = [];
     private array $events = [];
+    private array $registeredComponents = [];
     private ContainerInterface $container;
     private ?LoggerInterface $logger = null;
     
@@ -42,6 +43,51 @@ class SparkManager
     }
 
     /**
+     * Register a component class with a friendly name
+     */
+    public function registerComponent(string $name, string $className): void
+    {
+        if (!class_exists($className)) {
+            throw new \InvalidArgumentException("Component class {$className} does not exist");
+        }
+
+        if (!is_subclass_of($className, SparkComponent::class)) {
+            throw new \InvalidArgumentException("Component {$className} must extend " . SparkComponent::class);
+        }
+
+        $this->registeredComponents[$name] = $className;
+        
+        $this->log('debug', 'Component registered', [
+            'name' => $name,
+            'class' => $className
+        ]);
+    }
+
+    /**
+     * Get component class by name
+     */
+    public function getComponentClass(string $name): ?string
+    {
+        return $this->registeredComponents[$name] ?? null;
+    }
+
+    /**
+     * Check if component is registered
+     */
+    public function hasComponent(string $name): bool
+    {
+        return isset($this->registeredComponents[$name]);
+    }
+
+    /**
+     * Get all registered components
+     */
+    public function getRegisteredComponents(): array
+    {
+        return $this->registeredComponents;
+    }
+
+    /**
      * Register a component instance
      */
     public function register(string $id, SparkComponent $component): void
@@ -58,7 +104,7 @@ class SparkManager
     }
 
     /**
-     * Create a new component instance
+     * Create a new component instance by class name
      */
     public function createComponent(string $class, array $params = []): SparkComponent
     {
@@ -71,6 +117,35 @@ class SparkManager
         if (!class_exists($class) || !is_subclass_of($class, SparkComponent::class)) {
             throw new \InvalidArgumentException("Invalid component class: {$class}");
         }
+
+        return $this->instantiateComponent($class, $params);
+    }
+
+    /**
+     * Create a new component instance by registered name
+     */
+    public function createComponentByName(string $name, array $params = []): SparkComponent
+    {
+        $class = $this->getComponentClass($name);
+        
+        if (!$class) {
+            throw new \InvalidArgumentException("Component '{$name}' is not registered");
+        }
+
+        $this->log('debug', 'Creating component by name', [
+            'name' => $name,
+            'class' => $class,
+            'params' => $params
+        ]);
+
+        return $this->instantiateComponent($class, $params);
+    }
+
+    /**
+     * Internal method to instantiate component
+     */
+    private function instantiateComponent(string $class, array $params): SparkComponent
+    {
 
         try {
             $engine = $this->container->get(Engine::class);
@@ -296,6 +371,54 @@ class SparkManager
             
             throw new \RuntimeException("Failed to render component {$class}: " . $e->getMessage(), 0, $e);
         }
+    }
+
+    /**
+     * Render a component by registered name
+     */
+    public function renderComponentByName(string $name, array $params = []): string
+    {
+        $this->log('debug', 'Rendering component by name', [
+            'name' => $name,
+            'params' => $params
+        ]);
+        
+        try {
+            $component = $this->createComponentByName($name, $params);
+            $html = $component->toHtml();
+            
+            $this->log('debug', 'Component rendered successfully by name', [
+                'name' => $name,
+                'class' => get_class($component),
+                'html_length' => strlen($html)
+            ]);
+            
+            return $html;
+        } catch (\Throwable $e) {
+            $this->log('error', 'Failed to render component by name', [
+                'name' => $name,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            throw new \RuntimeException("Failed to render component '{$name}': " . $e->getMessage(), 0, $e);
+        }
+    }
+    
+    /**
+     * Static helper to render a component by name (convenience method)
+     */
+    public static function render(string $name, array $params = []): string
+    {
+        return self::getInstance()->renderComponentByName($name, $params);
+    }
+    
+    /**
+     * Static helper to create a component by name (convenience method)
+     */
+    public static function make(string $name, array $params = []): SparkComponent
+    {
+        return self::getInstance()->createComponentByName($name, $params);
     }
     
     /**

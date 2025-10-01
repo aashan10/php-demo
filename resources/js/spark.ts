@@ -29,7 +29,7 @@ class SparkComponent {
 
     constructor(element: ComponentElement) {
         this.element = element;
-        this.id = element.getAttribute('wire:id') || '';
+        this.id = element.getAttribute('spark:id') || '';
         
         console.log('[Spark] Initializing component', {
             id: this.id,
@@ -37,10 +37,10 @@ class SparkComponent {
         });
         
         // Parse initial data
-        const wireData = element.getAttribute('wire:data');
-        if (wireData) {
+        const sparkData = element.getAttribute('spark:data');
+        if (sparkData) {
             try {
-                const componentData: ComponentData = JSON.parse(atob(wireData));
+                const componentData: ComponentData = JSON.parse(atob(sparkData));
                 this.data = componentData.data;
                 this.checksum = componentData.checksum;
                 this.name = componentData.name; // Store component class name
@@ -52,15 +52,15 @@ class SparkComponent {
                     checksum: this.checksum
                 });
             } catch (e) {
-                console.error('[Spark] Failed to parse wire:data', {
+                console.error('[Spark] Failed to parse spark:data', {
                     id: this.id,
-                    wireData: wireData,
+                    sparkData: sparkData,
                     error: e
                 });
-                throw new Error(`Failed to initialize Spark component ${this.id}: Invalid wire:data`);
+                throw new Error(`Failed to initialize Spark component ${this.id}: Invalid spark:data`);
             }
         } else {
-            console.warn('[Spark] No wire:data attribute found', { id: this.id });
+            console.warn('[Spark] No spark:data attribute found', { id: this.id });
         }
 
         try {
@@ -344,7 +344,7 @@ class SparkComponent {
             // Preserve form inputs and focus
             this.preserveFormState(this.element, newContent as HTMLElement);
             
-            // Replace content but keep wire attributes
+            // Replace content but keep spark attributes
             this.element.innerHTML = newContent.innerHTML;
             
             // Re-setup event listeners for new elements
@@ -353,15 +353,15 @@ class SparkComponent {
     }
 
     private preserveFormState(oldElement: HTMLElement, newElement: HTMLElement): void {
-        // Preserve input values using wire:model attributes for better matching
-        const oldInputs = oldElement.querySelectorAll('input[wire\\:model], textarea[wire\\:model], select[wire\\:model]');
+        // Preserve input values using spark:model attributes for better matching
+        const oldInputs = oldElement.querySelectorAll('input[spark\\:model], textarea[spark\\:model], select[spark\\:model]');
         
         oldInputs.forEach((oldInput) => {
             if (oldInput instanceof HTMLInputElement || oldInput instanceof HTMLTextAreaElement || oldInput instanceof HTMLSelectElement) {
-                const wireModel = oldInput.getAttribute('wire:model');
-                if (wireModel) {
-                    // Find corresponding input in new element by wire:model attribute
-                    const newInput = newElement.querySelector(`[wire\\:model="${wireModel}"]`) as HTMLInputElement;
+                const sparkModel = oldInput.getAttribute('spark:model');
+                if (sparkModel) {
+                    // Find corresponding input in new element by spark:model attribute
+                    const newInput = newElement.querySelector(`[spark\\:model="${sparkModel}"]`) as HTMLInputElement;
                     
                     if (newInput) {
                         if (oldInput.type === 'checkbox' || oldInput.type === 'radio') {
@@ -371,7 +371,7 @@ class SparkComponent {
                         }
                         
                         console.log('[Spark] Preserved form state', {
-                            wireModel: wireModel,
+                            sparkModel: sparkModel,
                             oldValue: oldInput.value,
                             newValue: newInput.value
                         });
@@ -380,25 +380,25 @@ class SparkComponent {
             }
         });
 
-        // Preserve focus using wire:model for better matching
+        // Preserve focus using spark:model for better matching
         const focusedElement = oldElement.querySelector(':focus') as HTMLInputElement;
-        if (focusedElement && focusedElement.hasAttribute('wire:model')) {
-            const wireModel = focusedElement.getAttribute('wire:model');
-            const newFocusTarget = newElement.querySelector(`[wire\\:model="${wireModel}"]`) as HTMLElement;
+        if (focusedElement && focusedElement.hasAttribute('spark:model')) {
+            const sparkModel = focusedElement.getAttribute('spark:model');
+            const newFocusTarget = newElement.querySelector(`[spark\\:model="${sparkModel}"]`) as HTMLElement;
             
             if (newFocusTarget) {
                 setTimeout(() => {
                     newFocusTarget.focus();
-                    console.log('[Spark] Restored focus to', wireModel);
+                    console.log('[Spark] Restored focus to', sparkModel);
                 }, 0);
             }
         }
     }
 
     private setupEventListeners(): void {
-        // Set up wire:model listeners
-        this.element.querySelectorAll('[wire\\:model]').forEach(element => {
-            const property = element.getAttribute('wire:model');
+        // Set up spark:model listeners
+        this.element.querySelectorAll('[spark\\:model]').forEach(element => {
+            const property = element.getAttribute('spark:model');
             if (property && element instanceof HTMLInputElement) {
                 // Use blur event for text inputs to avoid too many updates
                 const eventType = (element.type === 'text' || element.type === 'email' || element.type === 'password') ? 'blur' : 'input';
@@ -411,9 +411,9 @@ class SparkComponent {
             }
         });
 
-        // Set up wire:click listeners
-        this.element.querySelectorAll('[wire\\:click]').forEach(element => {
-            const method = element.getAttribute('wire:click');
+        // Set up spark:click listeners
+        this.element.querySelectorAll('[spark\\:click]').forEach(element => {
+            const method = element.getAttribute('spark:click');
             if (method) {
                 element.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -422,10 +422,10 @@ class SparkComponent {
             }
         });
 
-        // Set up other wire event listeners
+        // Set up other spark event listeners
         ['change', 'blur', 'keydown', 'submit'].forEach(eventType => {
-            this.element.querySelectorAll(`[wire\\:${eventType}]`).forEach(element => {
-                const method = element.getAttribute(`wire:${eventType}`);
+            this.element.querySelectorAll(`[spark\\:${eventType}]`).forEach(element => {
+                const method = element.getAttribute(`spark:${eventType}`);
                 if (method) {
                     element.addEventListener(eventType, (e) => {
                         if (eventType === 'submit') {
@@ -435,6 +435,33 @@ class SparkComponent {
                     });
                 }
             });
+        });
+
+        // Set up spark:on-* event listeners for re-rendering
+        const sparkOnAttributes = Array.from(this.element.querySelectorAll('*'))
+            .flatMap(el => Array.from(el.attributes))
+            .filter(attr => attr.name.startsWith('spark:on-'));
+
+        sparkOnAttributes.forEach(attr => {
+            const element = attr.ownerElement;
+            const eventType = attr.name.substring(9); // Remove 'spark:on-' prefix
+            const action = attr.value;
+            
+            if (element && action === 'render') {
+                element.addEventListener(eventType, (e) => {
+                    console.log(`[Spark] ${eventType} event triggered re-render for component ${this.id}`);
+                    this.syncToServer();
+                });
+            } else if (element && action !== 'render') {
+                // Support method calls with spark:on-* syntax
+                element.addEventListener(eventType, (e) => {
+                    if (eventType === 'submit') {
+                        e.preventDefault();
+                    }
+                    console.log(`[Spark] ${eventType} event triggered method ${action} for component ${this.id}`);
+                    this.callMethod(action);
+                });
+            }
         });
     }
 
@@ -451,14 +478,14 @@ class SparkComponent {
 
     private handleValidationErrors(errors: Record<string, string[]>): void {
         // Clear existing error messages
-        this.element.querySelectorAll('.wire-error').forEach(el => el.remove());
+        this.element.querySelectorAll('.spark-error').forEach(el => el.remove());
 
         // Display new errors
         for (const [field, messages] of Object.entries(errors)) {
-            const input = this.element.querySelector(`[wire\\:model="${field}"]`);
+            const input = this.element.querySelector(`[spark\\:model="${field}"]`);
             if (input && messages.length > 0) {
                 const errorDiv = document.createElement('div');
-                errorDiv.className = 'wire-error text-red-500 text-sm mt-1';
+                errorDiv.className = 'spark-error text-red-500 text-sm mt-1';
                 errorDiv.textContent = messages[0];
                 input.parentElement?.appendChild(errorDiv);
             }
@@ -510,11 +537,11 @@ class Spark {
     private scanForComponents(): void {
         console.log('[Spark] Scanning for components');
         
-        const elements = document.querySelectorAll('[wire\\:id]');
+        const elements = document.querySelectorAll('[spark\\:id]');
         console.log(`[Spark] Found ${elements.length} potential components`);
         
         elements.forEach(element => {
-            const id = element.getAttribute('wire:id');
+            const id = element.getAttribute('spark:id');
             if (id && !this.components.has(id)) {
                 try {
                     console.log(`[Spark] Initializing component: ${id}`);

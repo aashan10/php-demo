@@ -185,28 +185,25 @@ class Engine
         error_log("[Engine] Spark component name: {$componentName}");
         
         try {
-            // Debug registry state
-            $registeredComponents = \Elementary\Spark\SparkComponentRegistry::all();
-            error_log("[Engine] Registered components: " . json_encode(array_keys($registeredComponents)));
+            // Debug registry state via SparkManager
+            error_log("[Engine] Processing live component: {$componentName}");
             
-            // Get the registered component class
-            if (!\Elementary\Spark\SparkComponentRegistry::has($componentName)) {
-                throw new \Exception("Live component '{$componentName}' is not registered. Available: " . implode(', ', array_keys($registeredComponents)));
-            }
-            
-            $className = \Elementary\Spark\SparkComponentRegistry::get($componentName);
-            error_log("[Engine] Found component class: {$className}");
-            
-            // Get the SparkComponentManager from globals
+            // Get the SparkManager from globals
             if (!isset($this->globals['__container'])) {
                 throw new \Exception('Container not available for live component rendering');
             }
             
             $container = $this->globals['__container'];
             $manager = $container->get('Elementary\\Spark\\SparkManager');
-            error_log("[Engine] Got manager, calling renderComponent");
             
-            $result = $manager->renderComponent($className, $attributes);
+            // Check if component is registered and render by name
+            if (!$manager->hasComponent($componentName)) {
+                $registeredComponents = $manager->getRegisteredComponents();
+                throw new \Exception("Live component '{$componentName}' is not registered. Available: " . implode(', ', array_keys($registeredComponents)));
+            }
+            
+            error_log("[Engine] Rendering component by name: {$componentName}");
+            $result = $manager->renderComponentByName($componentName, $attributes);
             error_log("[Engine] Component rendered successfully, length: " . strlen($result));
             
             return $result;

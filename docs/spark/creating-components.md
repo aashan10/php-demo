@@ -317,58 +317,123 @@ Templates use the Cigg templating engine:
         <span class="badge-inactive">Inactive</span>
     @endif
     
-    <button wire:click="toggleActive">
+    <button spark:click="toggleActive">
         {{ $isActive ? 'Deactivate' : 'Activate' }}
     </button>
 </div>
 ```
 
-### Wire Directives
+### Spark Directives
 
-Spark provides several wire directives for interactivity:
+Spark provides several directives for interactivity:
 
-#### `wire:click`
+#### `spark:click`
 ```html
-<button wire:click="methodName">Click Me</button>
-<button wire:click="methodWithParams('param1', 123)">With Params</button>
+<button spark:click="methodName">Click Me</button>
+<button spark:click="methodWithParams('param1', 123)">With Params</button>
 ```
 
-#### `wire:model`
+#### `spark:model`
 ```html
 <!-- Text input -->
-<input type="text" wire:model="name" placeholder="Enter name">
+<input type="text" spark:model="name" placeholder="Enter name">
 
 <!-- Number input -->
-<input type="number" wire:model="age">
+<input type="number" spark:model="age">
 
 <!-- Checkbox -->
-<input type="checkbox" wire:model="isActive"> Active
+<input type="checkbox" spark:model="isActive"> Active
 
 <!-- Select -->
-<select wire:model="selectedOption">
+<select spark:model="selectedOption">
     <option value="">Choose...</option>
     <option value="option1">Option 1</option>
     <option value="option2">Option 2</option>
 </select>
 
 <!-- Textarea -->
-<textarea wire:model="description"></textarea>
+<textarea spark:model="description"></textarea>
 ```
 
-#### `wire:submit`
+#### `spark:submit`
 ```html
-<form wire:submit="submitForm">
-    <input type="text" wire:model="formData.name">
-    <input type="email" wire:model="formData.email">
+<form spark:submit="submitForm">
+    <input type="text" spark:model="formData.name">
+    <input type="email" spark:model="formData.email">
     <button type="submit">Submit</button>
 </form>
 ```
 
-#### Other Wire Events
+#### Other Spark Events
 ```html
-<input wire:blur="validateField" wire:model="email">
-<input wire:keydown="handleKeypress" wire:model="search">
-<select wire:change="handleChange" wire:model="category">
+<input spark:blur="validateField" spark:model="email">
+<input spark:keydown="handleKeypress" spark:model="search">
+<select spark:change="handleChange" spark:model="category">
+```
+
+#### `spark:on-*` Event Directives
+
+The new `spark:on-*` directive system provides flexible event handling for any DOM event:
+
+```html
+<!-- Re-render component on blur -->
+<input type="text" spark:on-blur="render" placeholder="Re-renders on blur">
+
+<!-- Call method on focus -->
+<input type="email" spark:on-focus="validateEmail">
+
+<!-- Call method on any DOM event -->
+<button spark:on-mouseenter="onHover">Hover Me</button>
+<input spark:on-keydown="handleKeypress" type="text">
+<select spark:on-change="updateSelection">
+    <option value="option1">Option 1</option>
+    <option value="option2">Option 2</option>
+</select>
+
+<!-- Multiple event handlers -->
+<input type="text" 
+       spark:model="searchTerm"
+       spark:on-blur="render"
+       spark:on-keydown="handleKeypress">
+```
+
+**Supported Actions:**
+- `"render"` - Triggers component re-render via server sync
+- `"methodName"` - Calls the specified component method
+
+**Supported Events:**
+Any valid DOM event: `blur`, `focus`, `click`, `change`, `keydown`, `keyup`, `mouseenter`, `mouseleave`, `submit`, etc.
+
+**Example Component:**
+```php
+class SearchComponent extends SparkComponent
+{
+    public string $searchTerm = '';
+    public array $results = [];
+    
+    public function handleKeypress(Request $request): void
+    {
+        // Handle special key combinations
+        $key = $request->get('key');
+        if ($key === 'Enter') {
+            $this->search();
+        }
+    }
+    
+    public function validateEmail(): void
+    {
+        // Validate email on focus
+        if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+            $this->addError('email', 'Invalid email format');
+        }
+    }
+    
+    public function search(): void
+    {
+        // Perform search when term changes (triggered by render)
+        $this->results = $this->performSearch($this->searchTerm);
+    }
+}
 ```
 
 ### Conditional Rendering
@@ -395,10 +460,10 @@ Spark provides several wire directives for interactivity:
 @foreach($todos as $index => $todo)
     <div class="todo-item {{ $todo['completed'] ? 'completed' : '' }}">
         <input type="checkbox" 
-               wire:click="toggleTodo('{{ $todo['id'] }}')"
+               spark:click="toggleTodo('{{ $todo['id'] }}')"
                {{ $todo['completed'] ? 'checked' : '' }}>
         <span>{{ $todo['text'] }}</span>
-        <button wire:click="removeTodo('{{ $todo['id'] }}')">×</button>
+        <button spark:click="removeTodo('{{ $todo['id'] }}')">×</button>
     </div>
 @endforeach
 
@@ -506,16 +571,16 @@ class CustomValidationComponent extends SparkComponent
 
 ```html
 <!-- templates/spark/userform.cigg -->
-<form wire:submit="save">
+<form spark:submit="save">
     <div>
         <label>Name:</label>
-        <input type="text" wire:model="name">
+        <input type="text" spark:model="name">
         <!-- Errors are automatically displayed -->
     </div>
     
     <div>
         <label>Email:</label>
-        <input type="email" wire:model="email">
+        <input type="email" spark:model="email">
     </div>
     
     <button type="submit">Save</button>
