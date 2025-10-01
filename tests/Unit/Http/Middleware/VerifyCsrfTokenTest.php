@@ -91,7 +91,7 @@ class VerifyCsrfTokenTest extends TestCase
 
             $this->assertFalse($nextCalled, "Next should not be called for method $method without token");
             $this->assertEquals(419, $response->getStatusCode());
-            $this->assertEquals('Page Expired. Please refresh and try again.', $response->getContent());
+            $this->assertEquals('<h1>Session Expired</h1><p>For your security, this form has expired. Please <a href="javascript:window.location.reload()">refresh the page</a> and try again.</p><script>setTimeout(function(){ window.location.reload(); }, 3000);</script>', $response->getContent());
         }
     }
 
@@ -281,7 +281,7 @@ class VerifyCsrfTokenTest extends TestCase
 
         $this->assertFalse($nextCalled);
         $this->assertEquals(419, $response->getStatusCode());
-        $this->assertEquals('Page Expired. Please refresh and try again.', $response->getContent());
+        $this->assertEquals('<h1>Session Expired</h1><p>For your security, this form has expired. Please <a href="javascript:window.location.reload()">refresh the page</a> and try again.</p><script>setTimeout(function(){ window.location.reload(); }, 3000);</script>', $response->getContent());
     }
 
     public function testIsReadingMethod(): void

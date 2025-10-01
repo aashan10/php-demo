@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace Elementary\Session\Drivers;
 
 use Elementary\Database\DatabaseManager;
-use Elementary\Database\Contracts\QueryBuilderInterface;
-use stdClass;
 
 class DatabaseSessionDriver implements SessionDriverInterface
 {
-    private QueryBuilderInterface $query;
+    private DatabaseManager $manager;
     private string $table;
 
     public function __construct(DatabaseManager $manager, string $table)
     {
-        $this->query = $manager->newQuery();
+        $this->manager = $manager;
         $this->table = $table;
     }
 
@@ -31,7 +29,7 @@ class DatabaseSessionDriver implements SessionDriverInterface
 
     public function read(string $id): string|false
     {
-        $session = $this->query->table($this->table)->where('id', '=', $id)->first();
+        $session = $this->manager->newQuery()->table($this->table)->where('id', '=', $id)->first();
 
         if ($session && isset($session['payload'])) {
             return base64_decode($session['payload']);
@@ -46,8 +44,8 @@ class DatabaseSessionDriver implements SessionDriverInterface
         $last_activity = time();
 
         // Delete existing session and insert new one (atomic operation in transaction)
-        $this->query->table($this->table)->where('id', '=', $id)->delete();
-        $this->query->table($this->table)->insert([
+        $this->manager->newQuery()->table($this->table)->where('id', '=', $id)->delete();
+        $this->manager->newQuery()->table($this->table)->insert([
             'id' => $id,
             'payload' => $payload,
             'last_activity' => $last_activity,
@@ -58,13 +56,13 @@ class DatabaseSessionDriver implements SessionDriverInterface
 
     public function destroy(string $id): bool
     {
-        $this->query->table($this->table)->where('id', '=', $id)->delete();
+        $this->manager->newQuery()->table($this->table)->where('id', '=', $id)->delete();
         return true;
     }
 
     public function gc(int $max_lifetime): int|false
     {
-        return $this->query->table($this->table)
+        return $this->manager->newQuery()->table($this->table)
             ->where('last_activity', '<=', time() - $max_lifetime)
             ->delete();
     }

@@ -23,6 +23,7 @@ class RedisDriver extends AbstractDriver
     private ?Redis $connection = null;
     private array $connectionPool = [];
     private int $currentConnections = 0;
+    private ?Redis $transactionConnection = null;
 
     /**
      * Get a query builder instance for Redis
@@ -45,6 +46,11 @@ class RedisDriver extends AbstractDriver
      */
     public function getConnection(): Redis
     {
+        // Return transaction connection if transaction is active
+        if ($this->transactionConnection !== null) {
+            return $this->transactionConnection;
+        }
+        
         if ($this->supportsPooling()) {
             return $this->getPooledConnection();
         }
@@ -159,7 +165,8 @@ class RedisDriver extends AbstractDriver
      */
     public function beginTransaction(): void
     {
-        $this->getConnection()->multi();
+        $this->transactionConnection = $this->getConnection();
+        $this->transactionConnection->multi();
     }
 
     /**
@@ -167,7 +174,10 @@ class RedisDriver extends AbstractDriver
      */
     public function commit(): void
     {
-        $this->getConnection()->exec();
+        if ($this->transactionConnection) {
+            $this->transactionConnection->exec();
+            $this->transactionConnection = null;
+        }
     }
 
     /**
@@ -175,7 +185,10 @@ class RedisDriver extends AbstractDriver
      */
     public function rollback(): void
     {
-        $this->getConnection()->discard();
+        if ($this->transactionConnection) {
+            $this->transactionConnection->discard();
+            $this->transactionConnection = null;
+        }
     }
 
     /**

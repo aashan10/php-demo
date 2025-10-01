@@ -27,7 +27,7 @@ class RedisQueryBuilder implements QueryBuilderInterface
     protected ?string $orderBy = null;
     protected ?int $limit = null;
     protected ?int $offset = null;
-    protected string $keyPattern = '*';
+    protected string|array $keyPattern = '*';
 
     public function __construct(RedisDriver $driver)
     {

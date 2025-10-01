@@ -50,6 +50,14 @@ class RedisSchemaBuilder implements SchemaBuilderInterface
     }
 
     /**
+     * Create a new "table" (key namespace) - alias for createTable
+     */
+    public function create(string $table, callable $callback): void
+    {
+        $this->createTable($table, $callback);
+    }
+
+    /**
      * Create a new "table" (key namespace)
      */
     public function createTable(string $table, callable $callback): void
@@ -80,6 +88,16 @@ class RedisSchemaBuilder implements SchemaBuilderInterface
             if ($this->driver->supportsPooling()) {
                 $this->driver->returnConnection($connection);
             }
+        }
+    }
+
+    /**
+     * Drop a "table" if it exists (delete all keys matching pattern)
+     */
+    public function dropIfExists(string $table): void
+    {
+        if ($this->hasTable($table)) {
+            $this->dropTable($table);
         }
     }
 

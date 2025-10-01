@@ -106,6 +106,7 @@ final class DatabaseManager
     {
         $this->drivers['mysql'] = MySQLDriver::class;
         $this->drivers['redis'] = \Elementary\Database\Drivers\RedisDriver::class;
+        $this->drivers['sqlite'] = \Elementary\Database\Drivers\SQLiteDriver::class;
         // Additional drivers will be registered here as they're implemented
         // $this->drivers['mongodb'] = MongoDBDriver::class;
     }
@@ -259,6 +260,10 @@ final class DatabaseManager
         
         if ($connection instanceof \Elementary\Database\Drivers\RedisDriver) {
             return new \Elementary\Database\Schema\RedisSchemaBuilder($connection);
+        }
+        
+        if ($connection instanceof \Elementary\Database\Drivers\SQLiteDriver) {
+            return new \Elementary\Database\Schema\SQLiteSchemaBuilder($connection);
         }
         
         throw new \RuntimeException("Schema builder not available for this driver type.");

@@ -273,7 +273,7 @@ class DirectiveRegistryTest extends TestCase
 
     public function test_registry_handles_complex_callable_functions()
     {
-        $complexCallable = function($expression, $raw = '') use (&$callCount) {
+        $complexCallable = function($expression, $raw = '') {
             static $callCount = 0;
             $callCount++;
             return "<?php /* Call #{$callCount} */ echo {$expression}; ?>";

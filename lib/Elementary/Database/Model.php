@@ -169,7 +169,7 @@ abstract class Model
     /**
      * Check if model has unsaved changes
      */
-    public function isDirty(string $attribute = null): bool
+    public function isDirty(?string $attribute = null): bool
     {
         if ($attribute) {
             return isset($this->attributes[$attribute]) && 
@@ -210,7 +210,7 @@ abstract class Model
     /**
      * Define a one-to-many relationship.
      */
-    protected function hasMany(string $related, string $foreignKey = null, string $localKey = null): HasMany
+    protected function hasMany(string $related, ?string $foreignKey = null, ?string $localKey = null): HasMany
     {
         $foreignKey = $foreignKey ?: $this->getForeignKey();
         $localKey = $localKey ?: $this->getKeyName();
@@ -218,7 +218,7 @@ abstract class Model
         return new HasMany(new $related, $this, $foreignKey, $localKey);
     }
 
-    protected function hasOne(string $related, string $foreignKey = null, string $localKey = null): HasOne
+    protected function hasOne(string $related, ?string $foreignKey = null, ?string $localKey = null): HasOne
     {
         $foreignKey = $foreignKey ?: $this->getForeignKey();
         $localKey = $localKey ?: $this->getKeyName();
@@ -226,7 +226,7 @@ abstract class Model
         return new HasOne(new $related, $this, $foreignKey, $localKey);
     }
 
-    protected function belongsTo(string $related, string $foreignKey = null, string $ownerKey = null): BelongsTo
+    protected function belongsTo(string $related, ?string $foreignKey = null, ?string $ownerKey = null): BelongsTo
     {
         $foreignKey = $foreignKey ?: $this->getForeignKey();
         $ownerKey = $ownerKey ?: (new $related)->getKeyName();

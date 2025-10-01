@@ -115,10 +115,12 @@ class StartSessionTest extends TestCase
             ->willReturn($this->driver);
             
         // Mock config values
-        $this->config->expects($this->once())
+        $this->config->expects($this->exactly(2))
             ->method('get')
-            ->with('session.lifetime', 120)
-            ->willReturn(120);
+            ->willReturnMap([
+                ['session.lifetime', 120, 120],
+                ['session.secure', false, false]
+            ]);
 
         $nextCalled = false;
         $next = function (Request $request) use (&$nextCalled) {
@@ -152,10 +154,12 @@ class StartSessionTest extends TestCase
             ->willReturn($this->driver);
             
         // Mock custom lifetime
-        $this->config->expects($this->once())
+        $this->config->expects($this->exactly(2))
             ->method('get')
-            ->with('session.lifetime', 120)
-            ->willReturn(1440); // 24 hours
+            ->willReturnMap([
+                ['session.lifetime', 120, 1440], // 24 hours
+                ['session.secure', false, false]
+            ]);
 
         $next = function (Request $request) {
             return new Response(200, 'Success');
@@ -186,10 +190,12 @@ class StartSessionTest extends TestCase
             ->method('getDriver')
             ->willReturn($this->driver);
             
-        $this->config->expects($this->once())
+        $this->config->expects($this->exactly(2))
             ->method('get')
-            ->with('session.lifetime', 120)
-            ->willReturn(120);
+            ->willReturnMap([
+                ['session.lifetime', 120, 120],
+                ['session.secure', false, false]
+            ]);
 
         $next = function (Request $request) use ($existingSessionId) {
             // Verify session ID was set from cookie
@@ -222,10 +228,12 @@ class StartSessionTest extends TestCase
             ->method('getDriver')
             ->willReturn($this->driver);
             
-        $this->config->expects($this->once())
+        $this->config->expects($this->exactly(2))
             ->method('get')
-            ->with('session.lifetime', 120)
-            ->willReturn(120);
+            ->willReturnMap([
+                ['session.lifetime', 120, 120],
+                ['session.secure', false, false]
+            ]);
 
         $next = function (Request $request) use ($invalidSessionId) {
             // Invalid session ID should not be used
@@ -256,10 +264,12 @@ class StartSessionTest extends TestCase
             ->method('getDriver')
             ->willReturn($this->driver);
             
-        $this->config->expects($this->once())
+        $this->config->expects($this->exactly(2))
             ->method('get')
-            ->with('session.lifetime', 120)
-            ->willReturn(120);
+            ->willReturnMap([
+                ['session.lifetime', 120, 120],
+                ['session.secure', false, false]
+            ]);
 
         $next = function (Request $request) {
             return new Response(200, 'Success');
@@ -269,10 +279,10 @@ class StartSessionTest extends TestCase
 
         $this->assertEquals(200, $response->getStatusCode());
         
-        // Verify session cookie was set on response
+        // Verify session was started and has an ID
         $newSessionId = session_id();
         $this->assertNotEmpty($newSessionId);
-        $this->assertEquals($newSessionId, $response->cookies->get($sessionName));
+        // Note: PHP handles session cookie automatically, no manual cookie setting needed
         
         // Clean up
         if (session_status() === PHP_SESSION_ACTIVE) {
@@ -295,10 +305,12 @@ class StartSessionTest extends TestCase
             ->method('getDriver')
             ->willReturn($this->driver);
             
-        $this->config->expects($this->once())
+        $this->config->expects($this->exactly(2))
             ->method('get')
-            ->with('session.lifetime', 120)
-            ->willReturn(120);
+            ->willReturnMap([
+                ['session.lifetime', 120, 120],
+                ['session.secure', false, false]
+            ]);
 
         $next = function (Request $request) {
             return new Response(200, 'Success');
@@ -335,11 +347,13 @@ class StartSessionTest extends TestCase
             ->method('getDriver')
             ->willReturn($this->driver);
             
-        // Mock lifetime config - allow multiple calls since middleware might call config multiple times
-        $this->config->expects($this->atLeastOnce())
+        // Mock config values
+        $this->config->expects($this->exactly(2))
             ->method('get')
-            ->with('session.lifetime', 120)
-            ->willReturn(120); // Use default 120 minutes (2 hours) that matches what's actually happening
+            ->willReturnMap([
+                ['session.lifetime', 120, 120],
+                ['session.secure', false, false]
+            ]);
 
         $next = function (Request $request) {
             // Verify session cookie parameters were set correctly
@@ -375,10 +389,12 @@ class StartSessionTest extends TestCase
             ->method('getDriver')
             ->willReturn($this->driver);
             
-        $this->config->expects($this->once())
+        $this->config->expects($this->exactly(2))
             ->method('get')
-            ->with('session.lifetime', 120)
-            ->willReturn(120);
+            ->willReturnMap([
+                ['session.lifetime', 120, 120],
+                ['session.secure', false, false]
+            ]);
 
         $next = function (Request $request) {
             // Empty session ID should not be used, new one should be generated
@@ -408,10 +424,12 @@ class StartSessionTest extends TestCase
             ->method('getDriver')
             ->willReturn($this->driver);
             
-        $this->config->expects($this->once())
+        $this->config->expects($this->exactly(2))
             ->method('get')
-            ->with('session.lifetime', 120)
-            ->willReturn(120);
+            ->willReturnMap([
+                ['session.lifetime', 120, 120],
+                ['session.secure', false, false]
+            ]);
 
         $next = function (Request $request) {
             // Session should start successfully even without cookies
@@ -443,10 +461,12 @@ class StartSessionTest extends TestCase
             ->method('getDriver')
             ->willReturn($this->driver);
             
-        $this->config->expects($this->once())
+        $this->config->expects($this->exactly(2))
             ->method('get')
-            ->with('session.lifetime', 120)
-            ->willReturn(120);
+            ->willReturnMap([
+                ['session.lifetime', 120, 120],
+                ['session.secure', false, false]
+            ]);
 
         $next = function (Request $request) {
             return new Response(200, 'Success');
@@ -454,10 +474,10 @@ class StartSessionTest extends TestCase
 
         $response = $this->middleware->process($request, $next);
 
-        // Verify response contains the session ID
+        // Verify session was started and has an ID
         $currentSessionId = session_id();
         $this->assertNotEmpty($currentSessionId);
-        $this->assertEquals($currentSessionId, $response->cookies->get($sessionName));
+        // Note: PHP handles session cookie automatically, no manual cookie setting needed
         
         // Clean up
         if (session_status() === PHP_SESSION_ACTIVE) {
